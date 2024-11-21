@@ -1,0 +1,11 @@
+Purpose: Store course-related information.
+Fields:
+Course Code
+Course Name
+Credit Hours
+Lecturer ID
+Example Content:
+
+M101,Introduction to Programming,3,L001
+M102,Data Structures,3,L002
+M103,Calculus,4,L002

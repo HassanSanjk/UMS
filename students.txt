@@ -1,0 +1,11 @@
+Purpose: Store student-related information.
+Fields:
+Student ID
+Name
+Program
+Courses Enrolled (Course Codes)
+Fee Status (paid/outstanding)
+Example Content:
+
+S001,John Doe,Computer Science,M101 M102,paid
+S002,Jane Smith,Engineering,M103,outstanding

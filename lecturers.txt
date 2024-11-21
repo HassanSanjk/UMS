@@ -1,0 +1,10 @@
+Purpose: Store lecturer-related information.
+Fields:
+Lecturer ID
+Name
+Department
+Courses Taught (Course Codes)
+Example Content:
+
+L001,Dr. Alan Turing,Computer Science,M101
+L002,Prof. Grace Hopper,Engineering,M102

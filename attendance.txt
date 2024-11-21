@@ -1,0 +1,9 @@
+Purpose: Store attendance records.
+Fields:
+Course Code
+Student ID
+Status (present/absent)
+Example Content:
+
+M101,S001,present
+M103,S002,absent
