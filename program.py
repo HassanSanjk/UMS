@@ -181,3 +181,177 @@ def update_grade(student_id, course_code, semester, marks, grade_letter):
 def record_attendance(date, course_code, student_id, status, lecturer_id):
     # Record new attendance entry in attendance.txt
     pass
+
+
+#------------------------------------------------MOHAMMED EISSA--------------------------------------------------
+
+# File Paths
+STUDENTS_FILE = "students.txt"
+PAYMENTS_FILE = "payments.txt"
+
+
+# Function to read data from a file
+def read_file(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            return file.readlines()
+    except FileNotFoundError:
+        print(f"Error: {file_path} not found. Creating a new file.")
+        open(file_path, 'w').close()  # Create the file if it doesn't exist
+        print(f"{file_path} created. Please populate it with data as needed.")
+        return []
+
+
+# Function to write data to a file
+def write_file(file_path, data):
+    try:
+        with open(file_path, 'w') as file:
+            file.writelines(data)
+    except Exception as e:
+        print(f"Error writing to {file_path}: {e}")
+
+
+# Function to check if input is a valid numeric value
+def is_valid_number(value):
+    return value.isdigit()
+
+
+# Function to check if a student exists in the students file
+def student_exists(student_id):
+    students = read_file(STUDENTS_FILE)
+    return any(student.startswith(student_id) for student in students)
+
+
+# Function to record tuition fees with duplicate check
+def record_tuition_fee():
+    student_id = input("Enter Student ID: ")
+    if not student_exists(student_id):
+        print("Error: Student ID not found in students file.")
+        return
+
+    # Read the existing payment records
+    payments = read_file(PAYMENTS_FILE)
+
+    # Check for existing payment record for the student
+    for record in payments:
+        if record.startswith(student_id):
+            print("Error: Payment record for this student already exists.")
+            return
+
+    # If no duplicate found, proceed to record the payment
+    amount_paid = input("Enter Amount Paid: ")
+    if not is_valid_number(amount_paid):
+        print("Error: Amount must be a numeric value.")
+        return
+
+    payment_record = f"{student_id},{amount_paid}\n"
+    payments.append(payment_record)
+    write_file(PAYMENTS_FILE, payments)
+    print("Tuition fee recorded successfully.")
+
+
+# Function to view outstanding fees
+def view_outstanding_fees():
+    students = read_file(STUDENTS_FILE)
+    payments = read_file(PAYMENTS_FILE)
+
+    paid_students = {line.split(",")[0] for line in payments}
+    outstanding = [line for line in students if line.split(",")[0] not in paid_students]
+
+    if outstanding:
+        print("Outstanding Fees for Students:")
+        for student in outstanding:
+            print(student.strip())
+    else:
+        print("No outstanding fees.")
+
+
+# Function to update payment records
+def update_payment_record():
+    student_id = input("Enter Student ID to update payment: ")
+    if not student_exists(student_id):
+        print("Error: Student ID not found in students file.")
+        return
+
+    new_amount = input("Enter New Amount Paid: ")
+    if not is_valid_number(new_amount):
+        print("Error: Amount must be a numeric value.")
+        return
+
+    data = read_file(PAYMENTS_FILE)
+    updated = False
+    for i, record in enumerate(data):
+        if record.startswith(student_id):
+            data[i] = f"{student_id},{new_amount}\n"
+            updated = True
+            break
+
+    if updated:
+        write_file(PAYMENTS_FILE, data)
+        print("Payment record updated successfully.")
+    else:
+        print("Student ID not found in payment records.")
+
+
+# Function to issue receipts
+def issue_receipt():
+    student_id = input("Enter Student ID: ")
+    payments = read_file(PAYMENTS_FILE)
+
+    for record in payments:
+        if record.startswith(student_id):
+            amount = record.split(",")[1].strip()
+            print(f"Receipt for Student ID: {student_id}")
+            print(f"Amount Paid: {amount}")
+            return
+
+    print("No payment record found for the given Student ID.")
+
+
+# Function to view financial summary
+def view_financial_summary():
+    payments = read_file(PAYMENTS_FILE)
+    try:
+        total_collected = sum(float(record.split(",")[1]) for record in payments)
+    except ValueError:
+        print("Error: Invalid data format in payments file.")
+        return
+
+    outstanding_count = len(read_file(STUDENTS_FILE)) - len(payments)
+
+    print("Financial Summary:")
+    print(f"Total Fees Collected: {total_collected}")
+    print(f"Number of Students with Outstanding Fees: {outstanding_count}")
+
+
+# Main Menu System
+def main_menu():
+    while True:
+        print("\n--- Main Menu ---")
+        print("1. Record Tuition Fee")
+        print("2. View Outstanding Fees")
+        print("3. Update Payment Record")
+        print("4. Issue Receipt")
+        print("5. View Financial Summary")
+        print("6. Exit")
+
+        choice = input("Enter your choice (1-6): ")
+        if choice == "1":
+            record_tuition_fee()
+        elif choice == "2":
+            view_outstanding_fees()
+        elif choice == "3":
+            update_payment_record()
+        elif choice == "4":
+            issue_receipt()
+        elif choice == "5":
+            view_financial_summary()
+        elif choice == "6":
+            print("Exiting the program. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+
+# Run the main menu
+main_menu()
