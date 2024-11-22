@@ -5,7 +5,7 @@
 
 
 
-
+#----------------------------------------------------------HASSAN ABDALLA--------------------------------------------------------------------------------------
 '''Lecturer 
 • View Assigned Modules: View the list of modules assigned to the lecturers. 
 • Record Grades: Add or update student grades for a specific module. 
