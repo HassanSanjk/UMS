@@ -1,11 +1,5 @@
-Purpose: Store student-related information.
-Fields:
-Student ID
-Name
-Program
-Courses Enrolled (Course Codes)
-Fee Status (paid/outstanding)
-Example Content:
+StudentID,Name,Email,Phone,Course
 
-S001,John Doe,Computer Science,M101 M102,paid
-S002,Jane Smith,Engineering,M103,outstanding
+S001,John Doe,john.doe@example.com,1234567890,CS101
+S002,Jane Smith,jane.smith@example.com,0987654321,CS102
+S003,Ali Hassan,ali.hassan@example.com,1122334455,CS101

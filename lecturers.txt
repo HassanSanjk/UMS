@@ -1,10 +1,4 @@
-Purpose: Store lecturer-related information.
-Fields:
-Lecturer ID
-Name
-Department
-Courses Taught (Course Codes)
-Example Content:
+InstructorID,InstructorName,Email,Courses
 
-L001,Dr. Alan Turing,Computer Science,M101
-L002,Prof. Grace Hopper,Engineering,M102
+I001,Dr. Smith,smith@example.com,CS101 CS102
+I002,Prof. Johnson,johnson@example.com,CS103

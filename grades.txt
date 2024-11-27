@@ -1,9 +1,5 @@
-Purpose: Store grades for students in courses.
-Fields:
-Student ID
-Course Code
-Grade
-Example Content:
+StudentID,CourseCode,Grade
 
-S001,M101,A
-S002,M103,B
+S001,CS101,A
+S002,CS102,B+
+S003,CS103,B

@@ -1,10 +1,7 @@
-Purpose: Manage login credentials for students, lecturers, and administrators.
-Fields:
-User ID
-Role (Administrator/Lecturer/Student)
-Password
-Example Content:
+UserID,Password,Role
 
-admin,Administrator,password123
-L001,Lecturer,lecturer123
-S001,Student,student123
+S001,password123,student
+S002,qwerty456,student
+L001,admin123,lecturer
+L002,teach789,lecturer
+A001,adminpass123,admin
