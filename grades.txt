@@ -1,5 +1,3 @@
-StudentID,CourseCode,Grade
-
 S001,CS101,A
 S002,CS102,B+
 S003,CS103,B

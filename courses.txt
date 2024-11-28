@@ -1,4 +1,2 @@
-CourseID,CourseName,InstructorID,CreditHours
-
-CS101,Introduction to Programming,I001,3
-CS102,Data Structures,I002,4
+CS101,Introduction to Programming,L001,3
+CS102,Data Structures,L002,4

@@ -1,4 +1,2 @@
-InstructorID,InstructorName,Email,Courses
-
 I001,Dr. Smith,smith@example.com,CS101 CS102
 I002,Prof. Johnson,johnson@example.com,CS103
