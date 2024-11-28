@@ -1,9 +1,12 @@
 #University Management System
 
-
-
-
-
+# File Paths
+STUDENTS_FILE = "students.txt"
+COURSES_FILE = "courses.txt"
+LECTURERS_FILE = "lecturers.txt"
+ATTENDANCE_FILE = "attendance.txt"
+GRADES_FILE = "grades.txt"
+USERS_FILE = "users.txt"
 
 #----------------------------------------------------------HASSAN ABDALLA--------------------------------------------------------------------------------------
 '''Lecturer 
@@ -46,7 +49,7 @@ def view_assigned_modules(lecturer_id):
         modules = []
         with open("lecturer_modules.txt", "r") as file:
             for line in file:
-                l_id, course_code, semester = line.strip().split(",")
+                l_id, l_name, l_email, course_code= line.strip().split(",")
                 if l_id == lecturer_id:
                     # Get course details from courses.txt
                     course_name = get_course_name(course_code)
@@ -185,9 +188,6 @@ def record_attendance(date, course_code, student_id, status, lecturer_id):
 
 #------------------------------------------------MOHAMMED EISSA--------------------------------------------------
 
-# File Paths
-STUDENTS_FILE = "students.txt"
-PAYMENTS_FILE = "payments.txt"
 
 
 # Function to read data from a file
