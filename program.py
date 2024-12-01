@@ -1,5 +1,5 @@
 #University Management System
-
+#-------------------------------------------------------------------------------Common Functions------------------------------------------------------------------------------
 # File Paths
 STUDENTS_FILE = "students.txt"
 COURSES_FILE = "courses.txt"
@@ -7,6 +7,56 @@ LECTURERS_FILE = "lecturers.txt"
 ATTENDANCE_FILE = "attendance.txt"
 GRADES_FILE = "grades.txt"
 USERS_FILE = "users.txt"
+
+
+# Function to read data from a file
+def read_file(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            return [line.strip().split(',') for line in file]
+    except FileNotFoundError:
+        print(f"Error: {file_path} not found.")
+        return []
+    except Exception as e:
+        print(f"Error reading {file_path}: {e}")
+        return []
+    
+# Function to write data to a file
+def write_file(file_path, data):
+    try:
+        with open(file_path, 'w') as file:
+            file.writelines(data)
+    except Exception as e:
+        print(f"Error writing to {file_path}: {e}")
+#------------------------------------------------------------MAIN MENU-----------------------------------------------------------------------------------------
+
+def load_users():
+    users = {}
+    with open('users.txt', 'r') as file:
+        for line in file:
+            idd, password, role = line.strip().split(",")
+            users[idd] = {'password': password, 'role': role}
+    return users
+def login(users):
+    
+    print("\n----- Login -----")
+    username = input("Enter username: ")
+    password = input("Enter password: ")
+
+    if username in users and users[username]['password'] == password:
+        if users[username]['role'] == 'lecturer':
+            lecturer_menu("L001")
+        else:
+            main_menu()
+    else:
+        print("Invalid username or password.")
+        print(users[idd]['password'])
+
+
+
+
+
+
 
 #----------------------------------------------------------HASSAN ABDALLA--------------------------------------------------------------------------------------
 '''Lecturer 
@@ -18,13 +68,14 @@ USERS_FILE = "users.txt"
 
 def lecturer_menu(lecturer_id):
     while True:
-        print("\n=== Lecturer Menu ===")
-        print("1. View Assigned Modules")
-        print("2. Record/Update Grades")
-        print("3. View Student List")
-        print("4. Track Attendance")
-        print("5. View Student Grades")
-        print("6. Logout")
+        print("\n======= Lecturer Menu ========")
+        print("|   1. View Assigned Modules   |")
+        print("|   2. Record/Update Grades    |")
+        print("|   3. View Student List       |")
+        print("|   4. Track Attendance        |")
+        print("|   5. View Student Grades     |")
+        print("|   6. Logout                  |")
+        print("===============================\n")
         
         choice = input("\nEnter your choice: ")
         
@@ -47,7 +98,7 @@ def lecturer_menu(lecturer_id):
 def view_assigned_modules(lecturer_id):
     try:
         modules = []
-        with open("lecturer_modules.txt", "r") as file:
+        with open(LECTURERS_FILE, "r") as file:
             for line in file:
                 l_id, l_name, l_email, course_code= line.strip().split(",")
                 if l_id == lecturer_id:
@@ -189,33 +240,6 @@ def record_attendance(date, course_code, student_id, status, lecturer_id):
 #------------------------------------------------MOHAMMED EISSA--------------------------------------------------
 
 
-
-# Function to read data from a file
-def read_file(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            return file.readlines()
-    except FileNotFoundError:
-        print(f"Error: {file_path} not found. Creating a new file.")
-        open(file_path, 'w').close()  # Create the file if it doesn't exist
-        print(f"{file_path} created. Please populate it with data as needed.")
-        return []
-
-
-# Function to write data to a file
-def write_file(file_path, data):
-    try:
-        with open(file_path, 'w') as file:
-            file.writelines(data)
-    except Exception as e:
-        print(f"Error writing to {file_path}: {e}")
-
-
-# Function to check if input is a valid numeric value
-def is_valid_number(value):
-    return value.isdigit()
-
-
 # Function to check if a student exists in the students file
 def student_exists(student_id):
     students = read_file(STUDENTS_FILE)
@@ -240,7 +264,7 @@ def record_tuition_fee():
 
     # If no duplicate found, proceed to record the payment
     amount_paid = input("Enter Amount Paid: ")
-    if not is_valid_number(amount_paid):
+    if not (amount_paid):
         print("Error: Amount must be a numeric value.")
         return
 
@@ -274,7 +298,7 @@ def update_payment_record():
         return
 
     new_amount = input("Enter New Amount Paid: ")
-    if not is_valid_number(new_amount):
+    if not new_amount.isdigit():
         print("Error: Amount must be a numeric value.")
         return
 
@@ -353,9 +377,9 @@ def main_menu():
             print("Invalid choice. Please try again.")
 
 
-# Run the main menu
-main_menu()
-
 #-----------------------------------------Omda-----------------------------------------------------------------------
 
 
+#--------------------------------------- Main program entry point--------------------------------------------------
+users = load_users()
+login(users)
