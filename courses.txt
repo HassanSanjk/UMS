@@ -1,2 +1,4 @@
-CS101,Introduction to Programming,L001,3
-CS102,Data Structures,L002,4
+Module ID, Module Name, Credit Hours, Semester
+CS101,Introduction to Programming,L001,3,1
+CS102,Data Structures,L001,4,2
+CS103,Object Oriented Programming,L002,4,2

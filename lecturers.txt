@@ -1,2 +1,3 @@
-I001,Dr. Smith,smith@example.com,CS101 CS102
-I002,Prof. Johnson,johnson@example.com,CS103
+lecturer ID, Lecturer Email, Modules
+L001,Dr. Smith,smith@example.com,CS101 CS102
+L002,Prof. Johnson,johnson@example.com,CS103

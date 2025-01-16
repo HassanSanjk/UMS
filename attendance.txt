@@ -1,5 +1,4 @@
 CourseCode,StudentID,Date,Status
-
 CS101,S001,2024-11-01,Present
 CS101,S002,2024-11-01,Absent
 CS102,S003,2024-11-02,Present
