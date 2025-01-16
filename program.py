@@ -7,6 +7,8 @@ LECTURERS_FILE = "lecturers.txt"
 ATTENDANCE_FILE = "attendance.txt"
 GRADES_FILE = "grades.txt"
 USERS_FILE = "users.txt"
+RECEIPTS_FILE = "receipts.txt"
+FEES_FILE = "fees.txt"
 
 ALID_ROLES = ['student', 'lecturer', 'admin', 'accountant', 'registrar']
 VALID_ATTENDANCE_STATUS = ['Present', 'Absent', 'Late']
@@ -16,11 +18,11 @@ CURRENT_SEMESTER = "2024/1"
 def read_file(file_path):
     try:
         with open(file_path, 'r') as file:
-            next(file)  # Skip header line
+            next(file)
             data = []
             for line in file:
-                data.append(line.strip().split(','))
-            return data
+                data.append(line.strip().split(","))
+        return data
     except FileNotFoundError:
         print(f"Error: {file_path} not found.")
         return []
@@ -51,11 +53,10 @@ def load_users():
     """
     users = {}
     try:
-        user_data = read_file(USERS_FILE)
+        print(read_file(USERS_FILE))
         if not user_data:
             print("Warning: No users found in users.txt")
             return users
-        print(user_data)
         for line in user_data:
             # Check if line has all required fields
             if len(line) >= 3:
@@ -87,7 +88,6 @@ def authenticate(email, password, users):
         if users[email]['password'] == password:
             role = users[email]['role']
             print(f"\nLogin successful! Welcome, {email}")
-            print(users)
             while True:
                 if role == 'student':
                     print("Student menu not implemented yet")
@@ -468,10 +468,6 @@ def view_student_grades(lecturer_id):
     input("Press Enter to continue...")
 
 #------------------------------------------------MOHAMMED EISSA--------------------------------------------------
-# File Paths
-STUDENTS_FILE = "students.txt"
-RECEIPTS_FILE = "receipts.txt"
-FEES_FILE = "fees.txt"
 
 # Function to read data from a file
 def read_file(file_path):

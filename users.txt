@@ -1,4 +1,4 @@
-User ID, Password, Role
+User ID,Password,Role
 S001,password123,student
 S002,qwerty456,student
 smith@example.com,te123,lecturer
