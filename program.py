@@ -54,6 +54,7 @@ def load_users():
     users = {}
     try:
         print(read_file(USERS_FILE))
+        user_data = read_file(USERS_FILE)
         if not user_data:
             print("Warning: No users found in users.txt")
             return users
@@ -898,6 +899,396 @@ def admin_menu():
 
 #----------------------------------------------------KHALED------------------------------------------------------------------------
 
+# STUDENTS_FILE = "students.txt"
+# COURSES_FILE = "courses.txt"
+# GRADES_FILE = "grades.txt"
+# ATTENDANCE_FILE = "attendance.txt"
+
+# Function to read data from a file
+def read_file(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            next(file)  # Skip header
+            return [line.strip().split(',') for line in file]
+    except FileNotFoundError:
+        print(f"Error: {file_path} not found.")
+        return []
+    except Exception as e:
+        print(f"Error reading {file_path}: {e}")
+        return []
+
+# Function to write data to a file
+def write_file(file_path, data):
+    try:
+        with open(file_path, 'w') as file:
+            file.writelines(data)
+    except Exception as e:
+        print(f"Error writing to {file_path}: {e}")
+
+# Function to append data to a file
+def append_file(file_path, data):
+    try:
+        with open(file_path, 'a') as file:
+            file.writelines(data)
+    except Exception as e:
+        print(f"Error writing to {file_path}: {e}")
+
+
+# ------------------------------
+# Student Functions
+# ------------------------------
+
+# 1. View Available Modules
+def view_available_modules():
+    courses = read_file(COURSES_FILE)
+    if not courses:
+        print("No courses available.")
+        return
+    print("Available Modules:")
+    print("Module ID | Module Name | Credit Hours | Semester")
+    for course in courses:
+        print(" | ".join(course))
+
+
+# 2. Enroll in a Module
+def enroll_in_module(student_id):
+    courses = read_file(COURSES_FILE)
+    students = read_file(STUDENTS_FILE)
+    
+    # Find the student
+    student = next((s for s in students if s[0] == student_id), None)
+    if not student:
+        print(f"Student with ID {student_id} not found.")
+        return
+
+    print("Available Modules for Enrollment:")
+    for i, course in enumerate(courses, start=1):
+        print(f"{i}. {course[1]} (Module ID: {course[0]})")
+
+    choice = input("Enter the number of the module to enroll in: ")
+    if not choice.isdigit() or int(choice) < 1 or int(choice) > len(courses):
+        print("Invalid choice.")
+        return
+    
+    selected_course = courses[int(choice) - 1][0]  # Get Module ID
+    enrolled_courses = student[3].split(';') if student[3] else []
+
+    if selected_course in enrolled_courses:
+        print("You are already enrolled in this module.")
+        return
+    
+    enrolled_courses.append(selected_course)
+    student[3] = ';'.join(enrolled_courses)
+
+    # Update the student record
+    updated_students = [','.join(s) + '\n' for s in students]
+    write_file(STUDENTS_FILE, updated_students)
+    print(f"Successfully enrolled in {selected_course}.")
+
+
+# 3. View Grades
+def view_grades(student_id):
+    grades = read_file(GRADES_FILE)
+    student_grades = [g for g in grades if g[0] == student_id]
+    
+    if not student_grades:
+        print("No grades available.")
+        return
+
+    print("Your Grades:")
+    print("Module | Grade Percentage")
+    for grade in student_grades:
+        print(f"{grade[1]} | {grade[2]}%")
+
+
+# 4. View Attendance
+def view_attendance(student_id):
+    attendance = read_file(ATTENDANCE_FILE)
+    student_attendance = [a for a in attendance if a[1] == student_id]
+
+    if not student_attendance:
+        print("No attendance records found.")
+        return
+
+    print("Your Attendance:")
+    print("Course Code | Date | Status")
+    for record in student_attendance:
+        print(" | ".join(record[0:4]))
+
+
+# 5. Manage Personal Profile
+def manage_profile(student_id):
+    students = read_file(STUDENTS_FILE)
+    
+    # Find the student
+    student = next((s for s in students if s[0] == student_id), None)
+    if not student:
+        print(f"Student with ID {student_id} not found.")
+        return
+    
+    print("Your Profile:")
+    print(f"ID: {student[0]}")
+    print(f"Name: {student[1]}")
+    print(f"Email: {student[2]}")
+    print(f"Enrolled Courses: {student[3]}")
+    
+    print("\nWhat would you like to update?")
+    print("1. Name")
+    print("2. Email")
+    print("3. Cancel")
+    
+    choice = input("Enter your choice: ")
+    if choice == "1":
+        new_name = input("Enter new name: ")
+        student[1] = new_name
+    elif choice == "2":
+        new_email = input("Enter new email: ")
+        student[2] = new_email
+    else:
+        print("Cancelled.")
+        return
+    
+    # Update the student record
+    updated_students = [','.join(s) + '\n' for s in students]
+    write_file(STUDENTS_FILE, updated_students)
+    print("Profile updated successfully.")
+
+
+# ------------------------------
+# Menu for Student Functions
+# ------------------------------
+
+def student_menu(student_id):
+    while True:
+        print("\nStudent Menu:")
+        print("1. View Available Modules")
+        print("2. Enroll in a Module")
+        print("3. View Grades")
+        print("4. View Attendance")
+        print("5. Manage Personal Profile")
+        print("6. Logout")
+
+        choice = input("Enter your choice: ")
+        if choice == "1":
+            view_available_modules()
+        elif choice == "2":
+            enroll_in_module(student_id)
+        elif choice == "3":
+            view_grades(student_id)
+        elif choice == "4":
+            view_attendance(student_id)
+        elif choice == "5":
+            manage_profile(student_id)
+        elif choice == "6":
+            print("Logging out...")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+
+
+
+#---------------------------------------------------HUSSEIN-----------------------------------------------------------------------------------
+
+# Registrar & Documentation System with Enrollment Management
+
+class Student:
+   
+
+    def __init__(self, student_id, first_name, last_name, course_enrolled):
+        """
+        Initializes a new student with the provided details.
+        """
+        self.student_id = student_id
+        self.first_name = first_name
+        self.last_name = last_name
+        self.course_enrolled = course_enrolled
+        self.transcript = []
+
+    def update_record(self, first_name=None, last_name=None, course_enrolled=None):
+    
+        if first_name:
+            self.first_name = first_name
+        if last_name:
+            self.last_name = last_name
+        if course_enrolled:
+            self.course_enrolled = course_enrolled
+
+    def issue_transcript(self):
+       
+        self.transcript.append(f"Transcript for {self.first_name} {self.last_name}: Enrolled in {self.course_enrolled}.")
+        return self.transcript[-1]
+
+    def view_student_info(self):
+        
+        return f"Student ID: {self.student_id}, Name: {self.first_name} {self.last_name}, Course: {self.course_enrolled}"
+
+    def manage_enrollment(self, new_course):
+       
+        if new_course == "":
+            self.course_enrolled = None
+            return f"{self.first_name} {self.last_name} has been removed from the course."
+        else:
+            self.course_enrolled = new_course
+            return f"{self.first_name} {self.last_name} has been enrolled in {new_course}."
+
+
+class Registrar:
+  
+
+    def __init__(self):
+        """
+        Initializes the registrar system with an empty student record database.
+        """
+        self.students = {}
+    
+    def register_student(self, student_id, first_name, last_name, course_enrolled):
+        """
+        Registers a new student in the system.
+        
+        Parameters:
+        - student_id: Unique ID for the student.
+        - first_name: The first name of the student.
+        - last_name: The last name of the student.
+        - course_enrolled: The course the student is enrolled in.
+        """
+        if student_id not in self.students:
+            student = Student(student_id, first_name, last_name, course_enrolled)
+            self.students[student_id] = student
+            return f"Student {first_name} {last_name} registered successfully."
+        return "Student ID already exists."
+    
+    def update_student_info(self, student_id, first_name=None, last_name=None, course_enrolled=None):
+      
+        student = self.students.get(student_id)
+        if student:
+            student.update_record(first_name, last_name, course_enrolled)
+            return f"Student {student_id} record updated."
+        return "Student not found."
+
+    def view_student(self, student_id):
+       
+        student = self.students.get(student_id)
+        if student:
+            return student.view_student_info()
+        return "Student not found."
+
+    def issue_student_transcript(self, student_id):
+       
+        student = self.students.get(student_id)
+        if student:
+            return student.issue_transcript()
+        return "Student not found."
+
+    def generate_report(self):
+    
+        report = "Student Report:\n"
+        for student in self.students.values():
+            report += f"{student.view_student_info()}\n"
+        return report
+
+    def manage_enrollment(self, student_id, new_course):
+       
+        student = self.students.get(student_id)
+        if student:
+            return student.manage_enrollment(new_course)
+        return "Student not found."
+
+
+# System Documentation and User Guide
+USER_GUIDE = """
+System Documentation & User Guide
+
+1. **Registrar System Overview**:
+   - The Registrar System is designed to manage student records, including registration, enrollment, transcript issuance, and more.
+   - Students can register for courses, update their information, view their enrollment status, and generate transcripts.
+   - The system allows for enrollment management, meaning students can switch courses or withdraw from courses.
+
+2. **Features**:
+   - **Student Registration**: Registers new students with unique student IDs, names, and course enrollments.
+   - **View Student Information**: Displays the student's registration details, including name and enrolled course.
+   - **Enrollment Management**: Allows students to switch between courses or withdraw from a course entirely.
+   - **Transcript Issuance**: Generates transcripts containing the student's enrolled course details.
+   - **Student Information Update**: Updates student information, including name and course.
+   - **Report Generation**: Generates a report of all students in the system with their details.
+
+3. **User Guide**:
+   - **Step 1**: When prompted, provide your student ID, first name, last name, and course for registration.
+   - **Step 2**: You can choose to view your registration details after successfully registering.
+   - **Step 3**: You can manage your enrollment by either enrolling in a new course or withdrawing from your current course.
+   - **Step 4**: Update your personal or course information if needed.
+   - **Step 5**: Generate a transcript of your enrollment details.
+   - **Step 6**: If required, generate a report containing the details of all students in the system.
+
+4. **System Requirements**:
+   - The system runs in a standard Python environment with no external dependencies.
+   - No database or file system is required as the system operates entirely in-memory.
+
+5. **Usage Example**:
+   - The system prompts users for their ID, name, course details, and allows for interaction with different functionalities like updating details, enrolling in courses, or generating transcripts.
+"""
+
+# Example Usage:
+if __name__ == "__main__":
+    registrar = Registrar()
+
+    # Option to view the User Guide
+    guide_choice = input("Do you want to view the User Guide? (yes/no): ")
+    if guide_choice.lower() == 'yes':
+        print(USER_GUIDE)
+
+    # Input your details here dynamically
+    print("Welcome! Please provide the following information:")
+    
+    # Take user input for registration
+    student_id = input("Enter your student ID: ")
+    first_name = input("Enter your first name: ")
+    last_name = input("Enter your last name: ")
+    course_enrolled = input("Enter the course you want to register for: ")
+
+    # Register the student with the provided ID
+    print(registrar.register_student(student_id, first_name, last_name, course_enrolled))
+    
+    # Option to view student information
+    view_choice = input("\nDo you want to view your registration details? (yes/no): ")
+    if view_choice.lower() == 'yes':
+        print("\nYour registration details are:")
+        print(registrar.view_student(student_id))
+
+    # Option to manage enrollment (enroll in a new course or withdraw)
+    manage_enrollment_choice = input("\nDo you want to manage your enrollment? (yes/no): ")
+    if manage_enrollment_choice.lower() == 'yes':
+        new_course = input("Enter the new course you want to enroll in (leave empty to withdraw): ")
+        print(registrar.manage_enrollment(student_id, new_course))
+
+    # Option to update student information
+    update_choice = input("\nDo you want to update your details? (yes/no): ")
+    if update_choice.lower() == 'yes':
+        new_first_name = input("Enter your new first name (leave empty to skip): ")
+        new_last_name = input("Enter your new last name (leave empty to skip): ")
+        new_course = input("Enter your new course (leave empty to skip): ")
+        
+        # Update student info - If input is empty, pass None to indicate no update
+        print(registrar.update_student_info(student_id, 
+                                            new_first_name if new_first_name else None, 
+                                            new_last_name if new_last_name else None, 
+                                            new_course if new_course else None))
+
+        # View updated information
+        print("\nYour updated registration details are:")
+        print(registrar.view_student(student_id))
+
+    # Option to issue a transcript
+    issue_transcript_choice = input("\nDo you want to issue a transcript? (yes/no): ")
+    if issue_transcript_choice.lower() == 'yes':
+        print("\nYour Transcript:")
+        print(registrar.issue_student_transcript(student_id))
+
+    # Option to generate a report of all students
+    report_choice = input("\nDo you want to generate a report of all students? (yes/no): ")
+    if report_choice.lower() == 'yes':
+        print("\nGenerated Report:")
+        print(registrar.generate_report())
 #--------------------------------------- Main program entry point--------------------------------------------------
 users = load_users()
 login(users)
