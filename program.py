@@ -520,7 +520,7 @@ def view_student_grades(lecturer_id):
     input("Press Enter to continue...")
 
 #------------------------------------------------MOHAMMED EISSA--------------------------------------------------
-'''
+
 # Function to check if a student exists
 def student_exists(student_id):
     fees = read_file(FEES_FILE)
@@ -1076,7 +1076,6 @@ if __name__ == "__main__":
     if report_choice.lower() == 'yes':
         print("\nGenerated Report:")
         print(registrar.generate_report())
-'''
 #--------------------------------------- Main program entry point--------------------------------------------------
 users = load_users()
 login(users)
