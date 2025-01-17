@@ -703,7 +703,7 @@ def accountant_menu():
         else:
             print("Invalid choice. Please try again.")
     
-'''
+
 
 #-----------------------------------------Omda-----------------------------------------------------------------------
 
@@ -876,7 +876,6 @@ def student_menu(email):
 
 
 #---------------------------------------------------HUSSEIN-----------------------------------------------------------------------------------
-
 # Dictionary to store student data
 students = {}
 
@@ -884,74 +883,84 @@ students = {}
 USER_GUIDE = """
 Welcome to the Registrar System!
 
-Features:
-1. Register a new student.
-2. View student information.
-3. Update student details.
-4. Manage course enrollment.
-5. Generate student transcript.
-6. Generate a report of all students.
+This system allows you to:
+1. Register a new student with their details and enrolled course.
+2. View the information of a specific student by entering their ID.
+3. Update the personal details or enrolled course of an existing student.
+4. Manage course enrollment by enrolling in or withdrawing from a course.
+5. Generate and issue a transcript for a student.
+6. Generate a report listing all registered students and their details.
 
-Follow the on-screen instructions to use these features.
+Follow the prompts to use these features effectively.
 """
 
 # Function to register a new student
 def register_student(student_id, first_name, last_name, course_enrolled):
+    """Registers a new student by adding their details to the students dictionary."""
     if student_id in students:
-        return "Student ID already exists."
+        return f"Error: A student with ID {student_id} already exists."
     students[student_id] = {
         "first_name": first_name,
         "last_name": last_name,
         "course_enrolled": course_enrolled,
         "transcript": []
     }
-    return f"Student {first_name} {last_name} registered successfully."
+    return f"Student {first_name} {last_name} registered successfully with ID {student_id}."
 
 # Function to view student information
 def view_student(student_id):
+    """Displays the details of a student based on their ID."""
     if student_id not in students:
-        return "Student not found."
+        return f"Error: Student with ID {student_id} not found."
     student = students[student_id]
-    return f"Student ID: {student_id}, Name: {student['first_name']} {student['last_name']}, Course: {student['course_enrolled']}"
+    return (f"Student ID: {student_id}\n"
+            f"Name: {student['first_name']} {student['last_name']}\n"
+            f"Course Enrolled: {student['course_enrolled']}")
 
 # Function to update student information
 def update_student(student_id, first_name=None, last_name=None, course_enrolled=None):
+    """Updates the personal details or enrolled course of an existing student."""
     if student_id not in students:
-        return "Student not found."
+        return f"Error: Student with ID {student_id} not found."
     if first_name:
         students[student_id]["first_name"] = first_name
     if last_name:
         students[student_id]["last_name"] = last_name
     if course_enrolled:
         students[student_id]["course_enrolled"] = course_enrolled
-    return f"Student {student_id} record updated successfully."
+    return f"Student {student_id}'s record updated successfully."
 
-# Function to manage enrollment
+# Function to manage course enrollment
 def manage_enrollment(student_id, new_course):
+    """Manages a student's enrollment by enrolling in or withdrawing from a course."""
     if student_id not in students:
-        return "Student not found."
-    if new_course == "":
+        return f"Error: Student with ID {student_id} not found."
+    if new_course.strip() == "":
         students[student_id]["course_enrolled"] = None
-        return f"{students[student_id]['first_name']} {students[student_id]['last_name']} has been withdrawn from the course."
+        return f"{students[student_id]['first_name']} {students[student_id]['last_name']} has been withdrawn from all courses."
     students[student_id]["course_enrolled"] = new_course
-    return f"{students[student_id]['first_name']} {students[student_id]['last_name']} has been enrolled in {new_course}."
+    return f"{students[student_id]['first_name']} {students[student_id]['last_name']} has been enrolled in the course: {new_course}."
 
 # Function to issue a transcript
 def issue_transcript(student_id):
+    """Generates a transcript entry for the student and appends it to their record."""
     if student_id not in students:
-        return "Student not found."
+        return f"Error: Student with ID {student_id} not found."
     student = students[student_id]
-    transcript_entry = f"Transcript for {student['first_name']} {student['last_name']}: Enrolled in {student['course_enrolled']}."
+    transcript_entry = f"Transcript: {student['first_name']} {student['last_name']} is enrolled in {student['course_enrolled']}."
     student["transcript"].append(transcript_entry)
     return transcript_entry
 
 # Function to generate a report of all students
 def generate_report():
+    """Creates a report listing all students and their details."""
     if not students:
-        return "No students registered."
+        return "No students registered in the system."
     report = "Student Report:\n"
     for student_id, student in students.items():
-        report += f"Student ID: {student_id}, Name: {student['first_name']} {student['last_name']}, Course: {student['course_enrolled']}\n"
+        report += (f"Student ID: {student_id}, "
+                   f"Name: {student['first_name']} {student['last_name']}, "
+                   f"Course: {student['course_enrolled']}\n")
     return report
 
 # Main function to run the system
@@ -974,30 +983,30 @@ def main():
         choice = input("Enter your choice (1-7): ").strip()
         
         if choice == "1":  # Register a new student
-            student_id = input("Enter student ID: ")
-            first_name = input("Enter first name: ")
-            last_name = input("Enter last name: ")
-            course_enrolled = input("Enter the course to enroll in: ")
+            student_id = input("Enter student ID: ").strip()
+            first_name = input("Enter first name: ").strip()
+            last_name = input("Enter last name: ").strip()
+            course_enrolled = input("Enter the course to enroll in: ").strip()
             print(register_student(student_id, first_name, last_name, course_enrolled))
         
         elif choice == "2":  # View student information
-            student_id = input("Enter student ID: ")
+            student_id = input("Enter student ID: ").strip()
             print(view_student(student_id))
         
         elif choice == "3":  # Update student details
-            student_id = input("Enter student ID: ")
-            first_name = input("Enter new first name (or press Enter to skip): ")
-            last_name = input("Enter new last name (or press Enter to skip): ")
-            course_enrolled = input("Enter new course (or press Enter to skip): ")
+            student_id = input("Enter student ID: ").strip()
+            first_name = input("Enter new first name (or press Enter to skip): ").strip()
+            last_name = input("Enter new last name (or press Enter to skip): ").strip()
+            course_enrolled = input("Enter new course (or press Enter to skip): ").strip()
             print(update_student(student_id, first_name or None, last_name or None, course_enrolled or None))
         
         elif choice == "4":  # Manage course enrollment
-            student_id = input("Enter student ID: ")
-            new_course = input("Enter new course (or leave blank to withdraw): ")
+            student_id = input("Enter student ID: ").strip()
+            new_course = input("Enter new course (or leave blank to withdraw): ").strip()
             print(manage_enrollment(student_id, new_course))
         
         elif choice == "5":  # Issue a transcript
-            student_id = input("Enter student ID: ")
+            student_id = input("Enter student ID: ").strip()
             print(issue_transcript(student_id))
         
         elif choice == "6":  # Generate a report
@@ -1013,6 +1022,7 @@ def main():
 # Run the main function
 if __name__ == "__main__":
     main()
+
 
 
 
