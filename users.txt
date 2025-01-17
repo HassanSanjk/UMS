@@ -1,7 +1,16 @@
-User ID,Password,Role
-S001,password123,student
-S002,qwerty456,student
-smith@example.com,te123,lecturer
-johndoe@example.com,st123,student
-L002,teach789,lecturer
-A001,adminpass123,admin
+Email,Password,Role
+johndoe@example.com,student123,student
+janesmith@example.com,student456,student
+mbrown@example.com,student789,student
+swilson@example.com,student101,student
+dlee@example.com,student102,student
+edavis@example.com,student103,student
+jtaylor@example.com,student104,student
+ajohnson@example.com,student105,student
+smith@example.com,lecturer101,lecturer
+johnson@example.com,lecturer102,lecturer
+williams@example.com,lecturer103,lecturer
+anderson@example.com,lecturer104,lecturer
+admin@example.com,admin123,admin
+accountant@example.com,finance123,accountant
+registrar@example.com,reg123,registrar

@@ -1,3 +1,5 @@
-lecturer ID,Lecturer Email,Modules
+lecturer ID,Lecturer Name,Lecturer Email,Modules
 L001,Dr. Smith,smith@example.com,CS101 CS102
-L002,Prof. Johnson,johnson@example.com,CS103
+L002,Prof. Johnson,johnson@example.com,CS103 CS104
+L003,Dr. Williams,williams@example.com,CS105 CS106
+L004,Prof. Anderson,anderson@example.com,CS104 CS105
