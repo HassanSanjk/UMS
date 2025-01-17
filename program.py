@@ -148,7 +148,7 @@ def authenticate(email, password, users):
                     lecturer_menu(email)
                     break
                 elif role == 'admin':
-                    admin_menu()
+                   # admin_menu()
                     break
                 elif role == 'accountant':
                     pass
@@ -498,7 +498,7 @@ def view_student_grades(lecturer_id):
         return
         
     print(f"\n=== Grade Report for {module['course_code']} ===")
-    print("ID\t\tName\t\t\tMarks\tGrade")
+    print("ID\t\tName\t\tMarks\tGrade")
     print("-" * 70)
     
     for grade in grades:
@@ -707,184 +707,6 @@ def accountant_menu():
 
 #-----------------------------------------Omda-----------------------------------------------------------------------
 
-# Utility Functions for File Handling
-
-
-# Common File Handling Functions
-def ensure_file_exists(file_name, header=None):
-    """Ensures the specified file exists. Creates it with an optional header if not."""
-    try:
-        with open(file_name, 'r'):
-            pass
-    except FileNotFoundError:
-        with open(file_name, 'w') as file:
-            if header:
-                file.write(header + '\n')
-
-def load_file(file_name):
-    """Reads and parses the content of a file into a list of records."""
-    ensure_file_exists(file_name)  # Ensure the file exists
-    with open(file_name, 'r') as file:
-        return [line.strip().split(',') for line in file.readlines() if line.strip()]
-
-def save_to_file(file_name, data):
-    """Overwrites the file content with the provided data."""
-    with open(file_name, 'w') as file:
-        for record in data:
-            file.write(','.join(record) + '\n')
-
-def append_to_file(file_name, record):
-    """Appends a single record to a file."""
-    with open(file_name, 'a') as file:
-        file.write(','.join(record) + '\n')
-
-def delete_record(file_name, match_function):
-    """Deletes records matching a condition in the file."""
-    data = load_file(file_name)
-    updated_data = [record for record in data if not match_function(record)]
-    if len(data) == len(updated_data):
-        print("No matching records found.")
-    else:
-        save_to_file(file_name, updated_data)
-        print("Record(s) deleted successfully!")
-
-def admin_menu(user_email):
-    """
-    Displays the Administrator menu and handles navigation.
-    Args:
-        user_email (str): The email of the logged-in administrator.
-    """
-    while True:
-        print("\n--- Administrator Menu ---")
-        print(f"Logged in as: {user_email}")
-        print("1. Add Student")
-        print("2. Remove Student")
-        print("3. Add Course")
-        print("4. Remove Course")
-        print("5. View All Data (Select File)")
-        print("6. Generate Fees Report")
-        print("7. Reset User Password")
-        print("8. Exit")
-
-        choice = input("Enter your choice: ").strip()
-        if choice == '1':
-            add_student()
-        elif choice == '2':
-            remove_student()
-        elif choice == '3':
-            add_course()
-        elif choice == '4':
-            remove_course()
-        elif choice == '5':
-            file_choice = input("Enter file name to view: ").strip()
-            view_all_data(file_choice)
-        elif choice == '6':
-            generate_fees_report()
-        elif choice == '7':
-            reset_user_password()
-        elif choice == '8':
-            print("Exiting Administrator Menu...")
-            break
-        else:
-            print("Invalid choice. Please try again.")
-
-def add_student():
-    """Adds a new student to the students.txt file."""
-    student_id = input("Enter Student ID: ").strip()
-    student_name = input("Enter Student Name: ").strip()
-    student_email = input("Enter Student Email: ").strip()
-    enrolled_courses = input("Enter Enrolled Courses (comma-separated): ").strip()
-    total_fees = input("Enter Total Fees: ").strip()
-    outstanding_fees = input("Enter Outstanding Fees: ").strip()
-
-    students = load_file('students.txt')
-    for student in students:
-        if student[0] == student_id:
-            print("Student with this ID already exists!")
-            return
-    append_to_file('students.txt', [student_id, student_name, student_email, enrolled_courses, total_fees, outstanding_fees])
-    print(f"Student {student_name} added successfully!")
-
-def remove_student():
-    """Removes a student from the students.txt file using their ID."""
-    student_id = input("Enter Student ID to Remove: ").strip()
-    delete_record('students.txt', lambda record: record[0] == student_id)
-
-def add_course():
-    """Adds a new course to the courses.txt file."""
-    course_id = input("Enter Course Code: ").strip()
-    course_name = input("Enter Course Name: ").strip()
-    credit_hours = input("Enter Credit Hours: ").strip()
-    semester = input("Enter Semester: ").strip()
-
-    courses = load_file('courses.txt')
-    for course in courses:
-        if course[0] == course_id:
-            print("Course with this Code already exists!")
-            return
-    append_to_file('courses.txt', [course_id, course_name, credit_hours, semester])
-    print(f"Course {course_name} added successfully!")
-
-def remove_course():
-    """Removes a course from the courses.txt file using its ID."""
-    course_id = input("Enter Course ID to Remove: ").strip()
-    delete_record('courses.txt', lambda record: record[0] == course_id)
-
-def view_all_data(file_name):
-    """Displays the content of a given file."""
-    print(f"\n--- Data in {file_name} ---")
-    data = load_file(file_name)
-    if not data:
-        print("No data found.")
-        return
-    for record in data:
-        print(', '.join(record))
-
-def generate_fees_report():
-    """Generates a report summarizing total fees and outstanding fees."""
-    students = load_file('students.txt')
-    total_fees = 0
-    total_outstanding = 0
-
-    for student in students:
-        total_fees += float(student[4])  # Total Fees
-        total_outstanding += float(student[5])  # Outstanding Fees
-
-    print("\n--- Fees Report ---")
-    print(f"Total Fees Collected: {total_fees - total_outstanding}")
-    print(f"Total Outstanding Fees: {total_outstanding}")
-
-def reset_user_password():
-    """Allows the administrator to reset a user's password."""
-    user_id = input("Enter User ID: ").strip()
-    new_password = input("Enter New Password: ").strip()
-
-    users = load_file('users.txt')
-    user_found = False
-    for user in users:
-        if user[0] == user_id:
-            user[1] = new_password
-            user_found = True
-
-    if user_found:
-        save_to_file('users.txt', users)
-        print("Password reset successfully!")
-    else:
-        print("User ID not found.")
-
-def authenticate():
-    """Authenticates the user and directs them to the appropriate menu."""
-    user_email = input("Enter your email: ").strip()
-    user_password = input("Enter your password: ").strip()
-
-    users = load_file('users.txt')
-    for user in users:
-        if user[2] == 'Admin' and user[1] == user_password:
-            print("Authentication successful!")
-            admin_menu(user_email)
-            return
-
-    print("Invalid email or password. Try again.")
 
 #----------------------------------------------------KHALED------------------------------------------------------------------------
 
