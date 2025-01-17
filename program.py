@@ -163,7 +163,7 @@ def authenticate(email, password, users):
                     pass
                     break
                 elif role == 'registrar':
-                    print("Registrar menu not implemented yet")
+                    registrar_menu()
                     break
                 else:
                     print("Invalid role. Please contact administrator.")
@@ -880,23 +880,8 @@ def student_menu(email):
 
 
 #---------------------------------------------------HUSSEIN-----------------------------------------------------------------------------------
-# Dictionary to store student data
+# # Dictionary to store student data
 students = {}
-
-# User guide for the system
-USER_GUIDE = """
-Welcome to the Registrar System!
-
-This system allows you to:
-1. Register a new student with their details and enrolled course.
-2. View the information of a specific student by entering their ID.
-3. Update the personal details or enrolled course of an existing student.
-4. Manage course enrollment by enrolling in or withdrawing from a course.
-5. Generate and issue a transcript for a student.
-6. Generate a report listing all registered students and their details.
-
-Follow the prompts to use these features effectively.
-"""
 
 # Function to register a new student
 def register_student(student_id, first_name, last_name, course_enrolled):
@@ -968,11 +953,8 @@ def generate_report():
     return report
 
 # Main function to run the system
-def main():
-    print("Welcome to the Registrar System!")
-    guide_choice = input("Do you want to view the User Guide? (yes/no): ").strip().lower()
-    if guide_choice == "yes":
-        print(USER_GUIDE)
+def registrar_menu():
+    print("Welcome to the Registrar system!")
     
     while True:
         print("\nMenu:")
@@ -1022,13 +1004,6 @@ def main():
         
         else:
             print("Invalid choice. Please try again.")
-
-# Run the main function
-if __name__ == "__main__":
-    main()
-
-
-
 
 #--------------------------------------- Main program entry point--------------------------------------------------
 users = load_users()
