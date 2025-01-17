@@ -104,6 +104,15 @@ def get_enrolled_students(course_code, semester):
                 })
     return students
 
+def get_date():
+    # Get date input
+    while True:
+        date = input("\nEnter date (YYYY/MM/DD): ")
+        if len(date.split('/')) == 3:  # Basic date format validation
+            break
+        print("Invalid date format. Please use YYYY/MM/DD")
+    return date
+
 # The rest of your functions (load_users, authenticate, login, etc.) remain the same
 def load_users():
     """
@@ -350,7 +359,7 @@ def lecturer_menu(email):
             break
 
     while True:
-        print(f"\n======= Welcome {l_name} ========")
+        print(f"\n======= Welcome {l_name} ======")
         print("|   1. View Assigned Modules   |")
         print("|   2. Record/Update Grades    |")
         print("|   3. View Student List       |")
@@ -464,12 +473,7 @@ def track_attendance(lecturer_id):
         input("Press Enter to continue...")
         return
     
-    # Get date input
-    while True:
-        date = input("\nEnter date (YYYY/MM/DD): ")
-        if len(date.split('/')) == 3:  # Basic date format validation
-            break
-        print("Invalid date format. Please use YYYY/MM/DD")
+    date = get_date()
     
     print(f"\n=== Mark Attendance for {module['course_code']} ===")
     print(f"Date: {date}")
@@ -504,7 +508,7 @@ def view_student_grades(lecturer_id):
     for grade in grades:
         student = get_student_details(grade['student_id'])
         if student:
-            print(f"{student['id']}\t{student['name']}\t\t{grade['marks']}\t{grade['grade_letter']}")
+            print(f"{student['id']}\t{student['name']}\t\t\t{grade['marks']}\t{grade['grade_letter']}")
     
     # Calculate and display statistics
     marks = [float(grade['marks']) for grade in grades]

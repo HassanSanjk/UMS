@@ -1,7 +1,7 @@
 Module ID,Module Name,Credit Hours,Semester
-CS101,Introduction to Programming,3,1
+CS101,Advanced Physics,3,1
 CS102,Data Structures,4,2
-CS103,Object Oriented Programming,4,2
+CS103,Operating Systems,4,2
 CS104,Database Systems,3,1
 CS105,Web Development,3,2
 CS106,Software Engineering,4,1
