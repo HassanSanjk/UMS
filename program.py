@@ -1,6 +1,5 @@
 #University Management System
 #-------------------------------------------------------------------------------Common Functions------------------------------------------------------------------------------
-# File Paths
 STUDENTS_FILE = "students.txt"
 COURSES_FILE = "courses.txt"
 LECTURERS_FILE = "lecturers.txt"
@@ -8,9 +7,8 @@ ATTENDANCE_FILE = "attendance.txt"
 GRADES_FILE = "grades.txt"
 USERS_FILE = "users.txt"
 RECEIPTS_FILE = "receipts.txt"
-FEES_FILE = "fees.txt"
 
-ALID_ROLES = ['student', 'lecturer', 'admin', 'accountant', 'registrar']
+VALID_ROLES = ['student', 'lecturer', 'admin', 'accountant', 'registrar']
 VALID_ATTENDANCE_STATUS = ['Present', 'Absent', 'Late']
 CURRENT_SEMESTER = "2024/1"
 
@@ -44,8 +42,69 @@ def append_file(file_path, data):
             file.writelines(data)
     except Exception as e:
         print(f"Error writing to {file_path}: {e}")
-#------------------------------------------------------------MAIN MENU-----------------------------------------------------------------------------------------
 
+def get_student_details(student_id):
+    """Get student details from students.txt with updated structure"""
+    for line in read_file(STUDENTS_FILE):
+        if len(line) >= 6:  # Updated to check for new file structure
+            s_id, name, email, enrolled_courses, total_fees, outstanding_fees = line
+            if s_id == student_id:
+                return {
+                    'id': s_id,
+                    'name': name,
+                    'email': email,
+                    'enrolled_courses': enrolled_courses,
+                    'total_fees': float(total_fees),
+                    'outstanding_fees': float(outstanding_fees),
+                    'status': 'Enrolled'
+                }
+    return None
+
+def update_student_fees(student_id, payment_amount):
+    """Update student fees in students.txt after payment"""
+    students = read_file(STUDENTS_FILE)
+    new_students = ["StudentID,Name,Email,EnrolledCourses,TotalFees,OutstandingFees\n"]
+    updated = False
+    
+    for student in students:
+        if len(student) >= 6 and student[0] == student_id:
+            outstanding = float(student[5]) - payment_amount
+            new_line = f"{student[0]},{student[1]},{student[2]},{student[3]},{student[4]},{outstanding}\n"
+            new_students.append(new_line)
+            updated = True
+        else:
+            new_students.append(','.join(student) + '\n')
+    
+    if updated:
+        write_file(STUDENTS_FILE, new_students)
+        
+        # Record receipt
+        receipt_id = f"R{len(read_file(RECEIPTS_FILE)) + 1:04d}"
+        receipt_entry = f"{receipt_id},{student_id},{payment_amount},{CURRENT_SEMESTER}\n"
+        append_file(RECEIPTS_FILE, [receipt_entry])
+        
+        return True
+    return False
+
+# Update the existing functions to work with new structure
+def get_enrolled_students(course_code, semester):
+    """Get list of students enrolled in a specific course with updated structure"""
+    students = []
+    for line in read_file(STUDENTS_FILE):
+        if len(line) >= 6:  # Check for new file structure
+            student_id, name, email, enrolled_courses, total_fees, outstanding_fees = line
+            if course_code in enrolled_courses.split():
+                students.append({
+                    'id': student_id,
+                    'name': name,
+                    'email': email,
+                    'total_fees': float(total_fees),
+                    'outstanding_fees': float(outstanding_fees),
+                    'status': 'Enrolled'
+                })
+    return students
+
+# The rest of your functions (load_users, authenticate, login, etc.) remain the same
 def load_users():
     """
     Load user data from users.txt
@@ -53,16 +112,13 @@ def load_users():
     """
     users = {}
     try:
-        print(read_file(USERS_FILE))
         user_data = read_file(USERS_FILE)
         if not user_data:
             print("Warning: No users found in users.txt")
             return users
         for line in user_data:
-            # Check if line has all required fields
             if len(line) >= 3:
                 email, password, role = line
-                # Basic validation of user data
                 if email and password and role:
                     users[email] = {
                         'password': password,
@@ -70,28 +126,23 @@ def load_users():
                     }
             else:
                 print(f"Warning: Invalid user data format found in users.txt")
-
     except Exception as e:
         print(f"Error loading users: {e}")
         exit()
-        
     return users
 
 def authenticate(email, password, users):
-    """
-    Authenticate user and redirect to appropriate menu
-    """
+    """Authenticate user and redirect to appropriate menu"""
     if not email or not password:
         print("Email and password cannot be empty")
         return
     if email in users:
-        print(users[email]['password'])
         if users[email]['password'] == password:
             role = users[email]['role']
             print(f"\nLogin successful! Welcome, {email}")
             while True:
                 if role == 'student':
-                    print("Student menu not implemented yet")
+                    student_menu(email)
                     break
                 elif role == 'lecturer':
                     lecturer_menu(email)
@@ -100,7 +151,7 @@ def authenticate(email, password, users):
                     admin_menu()
                     break
                 elif role == 'accountant':
-                    accountant_menu()
+                    pass
                     break
                 elif role == 'registrar':
                     print("Registrar menu not implemented yet")
@@ -187,7 +238,7 @@ def get_enrolled_students(course_code, semester):
     """Get list of students enrolled in a specific course"""
     students = []
     for line in read_file(STUDENTS_FILE):
-        student_id, name, email, enrolled_courses = line
+        student_id, name, email, enrolled_courses, total_fees, outstanding_fees = line
         # Check if the course is in student's enrolled courses
         if course_code in enrolled_courses.split():
             students.append({
@@ -283,7 +334,7 @@ def record_attendance(date, course_code, student_id, status, lecturer_id):
 def get_student_details(student_id):
     """Get student details from students.txt"""
     for line in read_file(STUDENTS_FILE):
-        s_id, name, email, enrolled_courses = line
+        s_id, name, email, enrolled_courses, total_fees, outstanding_fees = line
         if s_id == student_id:
             return {
                 'id': s_id,
@@ -469,54 +520,7 @@ def view_student_grades(lecturer_id):
     input("Press Enter to continue...")
 
 #------------------------------------------------MOHAMMED EISSA--------------------------------------------------
-
-# Function to read data from a file
-def read_file(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            return [line.strip() for line in file.readlines()]
-    except FileNotFoundError:
-        print(f"Error: {file_path} not found. Creating a new file.")
-        open(file_path, 'w').close()
-        return []
-
-# Function to write data to a file
-def write_file(file_path, data):
-    try:
-        with open(file_path, 'w') as file:
-            for line in data:
-                if not line.endswith("\n"):
-                    line += "\n"
-                file.write(line)
-    except Exception as e:
-        print(f"Error writing to {file_path}: {e}")
-
-# Function to parse a line of data
-def parse_line(line, file_type):
-    if file_type == "students":
-        parts = line.split(" | ")
-        return {
-            "student_id": parts[0].split(": ")[1],
-            "name": parts[1].split(": ")[1],
-            "program": parts[2].split(": ")[1],
-        }
-    elif file_type == "fees":
-        parts = line.split(" | ")
-        return {
-            "student_id": parts[0].split(": ")[1],
-            "name": parts[1].split(": ")[1],
-            "paid": float(parts[2].split(": ")[1]),
-            "total": float(parts[3].split(": ")[1]),
-            "outstanding": float(parts[4].split(": ")[1]),
-        }
-    elif file_type == "receipts":
-        parts = line.split(" | ")
-        return {
-            "receipt_id": parts[0].split(": ")[1],
-            "student_id": parts[1].split(": ")[1],
-            "paid": float(parts[2].split(": ")[1]),
-        }
-
+'''
 # Function to check if a student exists
 def student_exists(student_id):
     fees = read_file(FEES_FILE)
@@ -698,6 +702,8 @@ def accountant_menu():
             break
         else:
             print("Invalid choice. Please try again.")
+    
+'''
 
 #-----------------------------------------Omda-----------------------------------------------------------------------
 
@@ -904,35 +910,6 @@ def admin_menu():
 # GRADES_FILE = "grades.txt"
 # ATTENDANCE_FILE = "attendance.txt"
 
-# Function to read data from a file
-def read_file(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            next(file)  # Skip header
-            return [line.strip().split(',') for line in file]
-    except FileNotFoundError:
-        print(f"Error: {file_path} not found.")
-        return []
-    except Exception as e:
-        print(f"Error reading {file_path}: {e}")
-        return []
-
-# Function to write data to a file
-def write_file(file_path, data):
-    try:
-        with open(file_path, 'w') as file:
-            file.writelines(data)
-    except Exception as e:
-        print(f"Error writing to {file_path}: {e}")
-
-# Function to append data to a file
-def append_file(file_path, data):
-    try:
-        with open(file_path, 'a') as file:
-            file.writelines(data)
-    except Exception as e:
-        print(f"Error writing to {file_path}: {e}")
-
 
 # ------------------------------
 # Student Functions
@@ -1058,7 +1035,12 @@ def manage_profile(student_id):
 # Menu for Student Functions
 # ------------------------------
 
-def student_menu(student_id):
+def student_menu(email):
+    for line in read_file(STUDENTS_FILE):
+        student_id, s_name, s_email, courses, total_fees, outstanding_fees = line
+        if s_email == email:
+            break
+
     while True:
         print("\nStudent Menu:")
         print("1. View Available Modules")
@@ -1089,7 +1071,7 @@ def student_menu(student_id):
 
 
 #---------------------------------------------------HUSSEIN-----------------------------------------------------------------------------------
-
+'''
 # Registrar & Documentation System with Enrollment Management
 
 class Student:
@@ -1289,6 +1271,7 @@ if __name__ == "__main__":
     if report_choice.lower() == 'yes':
         print("\nGenerated Report:")
         print(registrar.generate_report())
+'''
 #--------------------------------------- Main program entry point--------------------------------------------------
 users = load_users()
 login(users)

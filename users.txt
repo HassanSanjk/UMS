@@ -2,5 +2,6 @@ User ID,Password,Role
 S001,password123,student
 S002,qwerty456,student
 smith@example.com,te123,lecturer
+johndoe@example.com,st123,student
 L002,teach789,lecturer
 A001,adminpass123,admin
