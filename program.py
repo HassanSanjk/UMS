@@ -291,10 +291,6 @@ def calculate_grade(marks):
         return 'C'
     elif marks >= 50:
         return 'C-'
-    elif marks >= 45:
-        return 'D+'
-    elif marks >= 40:
-        return 'D'
     else:
         return 'F'
 
@@ -524,160 +520,129 @@ def view_student_grades(lecturer_id):
     input("Press Enter to continue...")
 
 #------------------------------------------------MOHAMMED EISSA--------------------------------------------------
-'''
-# Function to check if a student exists
-def student_exists(student_id):
-    fees = read_file(FEES_FILE)
-    return any(parse_line(line, "fees")["student_id"] == student_id for line in fees)
 
-# Function to get outstanding fees
-def get_outstanding_fees(student_id):
-    fees = read_file(FEES_FILE)
-    for line in fees:
-        data = parse_line(line, "fees")
-        if data["student_id"] == student_id:
-            return data["outstanding"]
-    return None
-
-# Function to validate numeric input
-def get_valid_number(prompt, max_value=None):
-    while True:
-        value = input(prompt)
-        if not value.replace('.', '', 1).isdigit():
-            print("Error: Please enter a valid numeric value.")
-        else:
-            value = float(value)
-            if value <= 0:
-                print("Error: Value must be greater than 0.")
-            elif max_value and value > max_value:
-                print(f"Error: Value cannot exceed {max_value}.")
-            else:
-                return value
-
-# Function to update all related files after payment
-def update_related_files(student_id, amount_paid):
-    try:
-        # Update fees.txt
-        fees = read_file(FEES_FILE)
-        updated_fees = []
-        for line in fees:
-            data = parse_line(line, "fees")
-            if data["student_id"] == student_id:
-                data["paid"] += amount_paid
-                data["outstanding"] -= amount_paid
-                line = (
-                    f"Student ID: {data['student_id']} | Name: {data['name']} | "
-                    f"Paid: {data['paid']} | Total: {data['total']} | Outstanding: {data['outstanding']}"
-                )
-            updated_fees.append(line)
-        write_file(FEES_FILE, updated_fees)
-
-        # Update receipts.txt
-        receipts = read_file(RECEIPTS_FILE)
-        receipt_id = f"R{len(receipts) + 1:03}"
-        receipt_record = f"Receipt ID: {receipt_id} | Student ID: {student_id} | Paid: {amount_paid} "
-        receipts.append(receipt_record)
-        write_file(RECEIPTS_FILE, receipts)
-
-        print("All related files updated successfully.")
-    except Exception as e:
-        print(f"Error updating files: {e}")
-
-# Function to record tuition fees
 def record_tuition_fee():
-    student_id = input("Enter Student ID: ")
-    if not student_exists(student_id):
+    """Record a payment and update student fees."""
+    student_id = input("Enter Student ID: ").strip()
+    student = get_student_details(student_id)
+    if not student:
         print("Error: Student ID not found.")
         return
 
-    outstanding_fees = get_outstanding_fees(student_id)
-    if outstanding_fees == 0:
-        print("No outstanding fees for this student.")
-        return
-
-    print(f"Outstanding Fees for Student ID {student_id}: {outstanding_fees}")
-    amount_paid = get_valid_number(f"Enter Amount Paid (max: {outstanding_fees}): ", max_value=outstanding_fees)
-
-    update_related_files(student_id, amount_paid)
-    print("Tuition fee recorded successfully.")
-
-# Function to view outstanding fees
-def view_outstanding_fees():
-    fees = read_file(FEES_FILE)
-    outstanding = [
-        line for line in fees if float(parse_line(line, "fees")["outstanding"]) > 0
-    ]
-
-    if outstanding:
-        print("Outstanding Fees for Students:")
-        for line in outstanding:
-            data = parse_line(line, "fees")
-            print(
-                f"Student ID: {data['student_id']} - Name: {data['name']} - Outstanding: {data['outstanding']}"
-            )
-    else:
-        print("No outstanding fees.")
-
-# Function to update payment records
-def update_payment_record():
-    student_id = input("Enter Student ID: ")
-    if not student_exists(student_id):
-        print("Error: Student ID not found.")
-        return
-
-    new_amount = get_valid_number("Enter New Amount Paid: ")
-    fees = read_file(FEES_FILE)
-    updated_fees = []
-    for line in fees:
-        data = parse_line(line, "fees")
-        if data["student_id"] == student_id:
-            data["paid"] = new_amount
-            data["outstanding"] = data["total"] - new_amount
-            line = (
-                f"Student ID: {data['student_id']} | Name: {data['name']} | "
-                f"Paid: {data['paid']} | Total: {data['total']} | Outstanding: {data['outstanding']}"
-            )
-        updated_fees.append(line)
-    write_file(FEES_FILE, updated_fees)
-    print("Payment record updated successfully.")
-
-# Function to issue receipts
-def issue_receipt():
-    student_id = input("Enter Student ID: ")
-    receipts = read_file(RECEIPTS_FILE)
-
-    # Filter receipts for the given student ID
-    student_receipts = [
-        parse_line(line, "receipts")
-        for line in receipts
-        if parse_line(line, "receipts")["student_id"] == student_id
-    ]
-
-    if not student_receipts:
-        print("No receipt found for the given Student ID.")
-        return
-
-    # Get the latest receipt by position (last entry for the student)
-    latest_receipt = student_receipts[-1]
-
-    print(
-        f"Receipt ID: {latest_receipt['receipt_id']} | Student ID: {latest_receipt['student_id']} | "
-        f"Paid: {latest_receipt['paid']} "
-    )
-
-# Function to view financial summary
-def view_financial_summary():
-    fees = read_file(FEES_FILE)
+    print(f"Outstanding Fees: {student['outstanding_fees']}")
     try:
-        total_collected = sum(parse_line(line, "fees")["paid"] for line in fees)
-        total_outstanding = sum(parse_line(line, "fees")["outstanding"] for line in fees)
+        payment = float(input("Enter payment amount: "))
+        if payment <= 0 or payment > student['outstanding_fees']:
+            print("Error: Invalid payment amount.")
+            return
+
+        students = read_file(STUDENTS_FILE)
+        updated_students = [students[0]]  # Keep header
+
+        for record in students[1:]:
+            if len(record) >= 6 and record[0].strip().lower() == student_id.strip().lower():
+                outstanding_fees = float(record[5].strip()) - payment
+                updated_students.append([
+                    record[0].strip(), record[1].strip(), record[2].strip(), record[3].strip(),
+                    record[4].strip(), f"{outstanding_fees:.2f}"
+                ])
+
+                receipt_id = f"R{len(read_file(RECEIPTS_FILE)) + 1:04d}"
+                date = get_date()
+                append_file(RECEIPTS_FILE, [receipt_id, student_id, f"{payment:.2f}", date])
+            else:
+                updated_students.append(record)
+
+        write_file(STUDENTS_FILE, updated_students)
+        print("Student record updated successfully.")
     except ValueError:
-        print("Error: Invalid data format.")
+        print("Error: Please enter a valid number.")
+
+def view_outstanding_fees():
+    """Display students with outstanding fees."""
+    students = read_file(STUDENTS_FILE)
+    if len(students) <= 1:
+        print("No students found in the file.")
         return
 
-    print("Financial Summary:")
-    print(f"Total Fees Collected: {total_collected}")
-    print(f"Total Outstanding Fees: {total_outstanding}")
+    print("\n--- Students with Outstanding Fees ---")
+    found = False
+    for student in students[1:]:
+        if len(student) >= 6 and float(student[5].strip()) > 0:
+            print(f"Student ID: {student[0].strip()}, Name: {student[1].strip()}, Outstanding Fees: {student[5].strip()}")
+            found = True
+
+    if not found:
+        print("No students with outstanding fees.")
+
+def update_payment_record():
+    """Update a specific payment record."""
+    student_id = input("Enter Student ID: ").strip()
+    student = get_student_details(student_id)
+    if not student:
+        print("Error: Student ID not found.")
+        return
+
+    try:
+        new_outstanding = float(input("Enter new outstanding amount: "))
+        if new_outstanding < 0 or new_outstanding > student['total_fees']:
+            print("Error: Invalid outstanding amount.")
+            return
+
+        students = read_file(STUDENTS_FILE)
+        updated_students = [students[0]]  # Keep header
+
+        for record in students[1:]:
+            if len(record) >= 6 and record[0].strip().lower() == student_id.strip().lower():
+                updated_students.append([
+                    record[0].strip(), record[1].strip(), record[2].strip(), record[3].strip(), record[4].strip(), f"{new_outstanding:.2f}"
+                ])
+            else:
+                updated_students.append(record)
+
+        write_file(STUDENTS_FILE, updated_students)
+        print(f"Outstanding amount for {student['name']} updated successfully.")
+    except ValueError:
+        print("Error: Please enter a valid number.")
+
+def issue_receipt():
+    """Display the latest receipt for a student."""
+    student_id = input("Enter Student ID: ").strip()
+    receipts = read_file(RECEIPTS_FILE)
+    if len(receipts) <= 1:
+        print("No receipts found.")
+        return
+
+    latest_receipt = None
+    for receipt in receipts:
+        if len(receipt) >= 4 and receipt[1].strip().lower() == student_id.strip().lower():
+            latest_receipt = receipt
+
+    if latest_receipt:
+        print(f"\n--- Latest Receipt ---\nReceipt ID: {latest_receipt[0]}, Student ID: {latest_receipt[1]}, Amount Paid: {latest_receipt[2]}, Date: {latest_receipt[3]}")
+    else:
+        print("No receipts found for this student.")
+
+def view_financial_summary():
+    """Display total paid and outstanding fees."""
+    students = read_file(STUDENTS_FILE)
+    if len(students) <= 1:
+        print("No students found in the file.")
+        return
+
+    total_paid = 0
+    total_outstanding = 0
+
+    for student in students[1:]:
+        if len(student) >= 6:
+            total_fees = float(student[4].strip())
+            outstanding_fees = float(student[5].strip())
+            total_paid += total_fees - outstanding_fees
+            total_outstanding += outstanding_fees
+
+    print("\n--- Financial Summary ---")
+    print(f"Total Paid: {total_paid:.2f}")
+    print(f"Total Outstanding: {total_outstanding:.2f}")
 
 # Main Menu
 def accountant_menu():
@@ -690,7 +655,7 @@ def accountant_menu():
         print("5. View Financial Summary")
         print("6. Exit")
 
-        choice = input("Enter your choice (1-6): ")
+        choice = input("Enter your choice: ").strip()
         if choice == "1":
             record_tuition_fee()
         elif choice == "2":
@@ -706,9 +671,6 @@ def accountant_menu():
             break
         else:
             print("Invalid choice. Please try again.")
-    
-
-'''
 #-----------------------------------------Omda-----------------------------------------------------------------------
 # Common File Handling Functions
 def reset_user_password():
