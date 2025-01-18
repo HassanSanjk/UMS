@@ -10,7 +10,6 @@ RECEIPTS_FILE = "receipts.txt"
 
 VALID_ROLES = ['student', 'lecturer', 'admin', 'accountant', 'registrar']
 VALID_ATTENDANCE_STATUS = ['Present', 'Absent', 'Late']
-CURRENT_SEMESTER = "2024/1"
 
 # Function to read data from a file
 def read_file(file_path):
@@ -80,7 +79,8 @@ def update_student_fees(student_id, payment_amount):
         
         # Record receipt
         receipt_id = f"R{len(read_file(RECEIPTS_FILE)) + 1:04d}"
-        receipt_entry = f"{receipt_id},{student_id},{payment_amount},{CURRENT_SEMESTER}\n"
+        date = get_date()
+        receipt_entry = f"{receipt_id},{student_id},{payment_amount},{date}\n"
         append_file(RECEIPTS_FILE, [receipt_entry])
         
         return True
@@ -108,8 +108,16 @@ def get_date():
     # Get date input
     while True:
         date = input("\nEnter date (YYYY/MM/DD): ")
-        if len(date.split('/')) == 3:  # Basic date format validation
-            break
+        valid_date = date.split('/')
+        # Basic date format validation
+        if len(valid_date) == 3:
+            if valid_date[0].isdigit() and valid_date[1].isdigit() and valid_date[2].isdigit():
+                # validating only dates between 2024 and 2030 with month in range 1-12 and date in range 1-31
+                if 2024 <= int(valid_date[0]) <= 2030 and 1 <= int(valid_date[1]) <= 12 and 1 <= int(valid_date[2]) <= 31:
+                    break
+                else:
+                    print("Invalid date range. Please enter a date between 2024 and 2030.")
+                    continue
         print("Invalid date format. Please use YYYY/MM/DD")
     return date
 
@@ -160,6 +168,7 @@ def authenticate(email, password, users):
                     admin_menu("admin@example.com")
                     break
                 elif role == 'accountant':
+                    accountant_menu()
                     pass
                     break
                 elif role == 'registrar':
@@ -188,16 +197,10 @@ def login(users):
     password = input("Enter password: ").strip()
     authenticate(email, password, users)
 
-
 #----------------------------------------------------------HASSAN ABDALLA--------------------------------------------------------------------------------------
-'''Lecturer 
-• View Assigned Modules: View the list of modules assigned to the lecturers. 
-• Record Grades: Add or update student grades for a specific module. 
-• View Student List: Display the list of students enrolled in each assigned module. 
-• Track Attendance: Mark attendance for students. 
-• View Student Grades: Access grades for students in each of the lecturer's modules. '''
+
 def get_courses(course_codes):
-    """Get course details for multiple course codes"""
+    #Get course details for multiple course codes
     if not course_codes:
         return []
         
@@ -355,16 +358,17 @@ def lecturer_menu(email):
             break
 
     while True:
-        print(f"\n======= Welcome {l_name} ======")
-        print("|   1. View Assigned Modules   |")
-        print("|   2. Record/Update Grades    |")
-        print("|   3. View Student List       |")
-        print("|   4. Track Attendance        |")
-        print("|   5. View Student Grades     |")
-        print("|   6. Logout                  |")
-        print("===============================\n")
+        print(f"\n===== Welcome {l_name.ljust(15)} =====")
+        print("|    1. View Assigned Modules     |")
+        print("|    2. Record/Update Grades      |")
+        print("|    3. View Student List         |")
+        print("|    4. Track Attendance          |")
+        print("|    5. View Student Grades       |")
+        print("|    6. Logout                    |")
+        print("===================================\n")
         
         choice = input("Enter your choice: ")
+        print("===============================\n")
         
         if choice == "1":
             view_assigned_modules(l_id)
@@ -388,11 +392,11 @@ def view_assigned_modules(lecturer_id):
         l_id, l_name, l_email, course_code = line
         if l_id == lecturer_id:
             courses = get_courses(course_code)
-            print(f"\n=== Assigned Modules for {l_name} ===")
-            print("Course Code\tCourse Name\t\tCredit Hours\tSemester")
+            print(f"\n================== Assigned Modules for {l_name} ====================")
+            print(f"Course Code".ljust(15) + "Course Name".ljust(25) + "Credit Hours".ljust(15) + "Semester")
             print("-" * 70)
             for course in courses:
-                print(f"{course[0]}\t\t{course[1]}\t\t{course[2]}\t\t{course[3]}")
+                print(course[0].ljust(15) + course[1].ljust(25) + "    "+course[2].ljust(15) + course[3])
             print("-" * 70)
             input("Press Enter to continue...")
             return
@@ -408,17 +412,17 @@ def record_grades(lecturer_id):
         input("Press Enter to continue...")
         return
     
-    print(f"\n=== Record Grades for {module['course_code']} ===")
-    print("Current grades:")
-    print("\nStudent ID\tName\t\tCurrent Grade")
-    print("-" * 50)
+    print(f"\n=== Record Grades for {module['course_code']} ===\n")
+    print("-"*55)
+    print(f"Student ID".ljust(15) + "Name".ljust(25) + "Current Grade")
+    print("-" * 55)
     
     current_grades = get_module_grades(module['course_code'], module['semester'])
     grades_dict = {grade['student_id']: grade['marks'] for grade in current_grades}
     
     for student in students:
         current_grade = grades_dict.get(student['id'], 'Not graded')
-        print(f"{student['id']}\t{student['name']}\t\t{current_grade}")
+        print(student['id'].ljust(15) + student['name'].ljust(25) + current_grade)
     
     print("\nEnter new grades (0-100) or press Enter to skip:")
     for student in students:
@@ -450,12 +454,12 @@ def view_student_list(lecturer_id):
         return
     
     print(f"\n=== Student List for {module['course_code']} ===")
-    print("ID\t\tName\t\t\tEmail")
-    print("-" * 70)
+    print(f"ID".ljust(10) + "Name".ljust(25)+"Email")
+    print("-" * 60)
     
     for student in students:
-        print(f"{student['id']}\t{student['name']}\t\t{student['email']}")
-    print("-" * 70)
+        print(student['id'].ljust(10) + student['name'].ljust(25)+student['email'])
+    print("-" * 60)
     input("Press Enter to continue...")
 
 def track_attendance(lecturer_id):
@@ -498,13 +502,13 @@ def view_student_grades(lecturer_id):
         return
         
     print(f"\n=== Grade Report for {module['course_code']} ===")
-    print("ID\t\tName\t\tMarks\tGrade")
+    print(f"ID".ljust(10)+"Name".ljust(25)+"Marks".ljust(10)+"Grade")
     print("-" * 70)
     
     for grade in grades:
         student = get_student_details(grade['student_id'])
         if student:
-            print(f"{student['id']}\t{student['name']}\t\t\t{grade['marks']}\t{grade['grade_letter']}")
+            print(student['id'].ljust(10)+student['name'].ljust(25)+grade['marks'].ljust(10)+grade['grade_letter'])
     
     # Calculate and display statistics
     marks = [float(grade['marks']) for grade in grades]
@@ -520,7 +524,6 @@ def view_student_grades(lecturer_id):
     input("Press Enter to continue...")
 
 #------------------------------------------------MOHAMMED EISSA--------------------------------------------------
-
 def record_tuition_fee():
     """Record a payment and update student fees."""
     student_id = input("Enter Student ID: ").strip()
@@ -529,34 +532,44 @@ def record_tuition_fee():
         print("Error: Student ID not found.")
         return
 
+    if student['outstanding_fees'] == 0:
+        print("This student has no outstanding fees. No payment required.")
+        return
+
     print(f"Outstanding Fees: {student['outstanding_fees']}")
-    try:
-        payment = float(input("Enter payment amount: "))
-        if payment <= 0 or payment > student['outstanding_fees']:
-            print("Error: Invalid payment amount.")
-            return
 
-        students = read_file(STUDENTS_FILE)
-        updated_students = [students[0]]  # Keep header
-
-        for record in students[1:]:
-            if len(record) >= 6 and record[0].strip().lower() == student_id.strip().lower():
-                outstanding_fees = float(record[5].strip()) - payment
-                updated_students.append([
-                    record[0].strip(), record[1].strip(), record[2].strip(), record[3].strip(),
-                    record[4].strip(), f"{outstanding_fees:.2f}"
-                ])
-
-                receipt_id = f"R{len(read_file(RECEIPTS_FILE)) + 1:04d}"
-                date = get_date()
-                append_file(RECEIPTS_FILE, [receipt_id, student_id, f"{payment:.2f}", date])
+    while True:
+        try:
+            payment = float(input("Enter payment amount: "))
+            if payment <= 0:
+                print("Error: Payment amount must be greater than 0.")
+            elif payment > student['outstanding_fees']:
+                print("Error: Payment amount exceeds outstanding fees. Please enter a valid amount.")
             else:
-                updated_students.append(record)
+                break  # Valid payment entered
+        except ValueError:
+            print("Error: Please enter a valid number.")
 
-        write_file(STUDENTS_FILE, updated_students)
-        print("Student record updated successfully.")
-    except ValueError:
-        print("Error: Please enter a valid number.")
+    students = read_file(STUDENTS_FILE)
+    updated_students = [students[0]]  # Keep header
+
+    for record in students[1:]:
+        if len(record) >= 6 and record[0].strip().lower() == student_id.strip().lower():
+            outstanding_fees = float(record[5].strip()) - payment
+            updated_students.append([
+                record[0].strip(), record[1].strip(), record[2].strip(), record[3].strip(),
+                record[4].strip(), f"{outstanding_fees:.2f}"
+            ])
+
+            receipt_id = f"R{len(read_file(RECEIPTS_FILE)) + 1:04d}"
+            date = get_date()
+            append_file(RECEIPTS_FILE, [receipt_id, student_id, f"{payment:.2f}", date])
+        else:
+            updated_students.append(record)
+
+    write_file(STUDENTS_FILE, updated_students)
+    print("Student record updated successfully.")
+
 
 def view_outstanding_fees():
     """Display students with outstanding fees."""
@@ -647,13 +660,17 @@ def view_financial_summary():
 # Main Menu
 def accountant_menu():
     while True:
-        print("\n--- Main Menu ---")
-        print("1. Record Tuition Fee")
-        print("2. View Outstanding Fees")
-        print("3. Update Payment Record")
-        print("4. Issue Receipt")
-        print("5. View Financial Summary")
-        print("6. Exit")
+        print("\n" + "🌟" * 40)
+        print(" " * 12 + "✨ MAIN MENU ✨")
+        print("🌟" * 40)
+        print("🔹 1️⃣  📋 Record Tuition Fee")
+        print("🔹 2️⃣  💳 View Outstanding Fees")
+        print("🔹 3️⃣  ✏️  Update Payment Record")
+        print("🔹 4️⃣  🧾 Issue Receipt")
+        print("🔹 5️⃣  📊 View Financial Summary")
+        print("🔹 6️⃣  ❌ Exit")
+        print("🌟" * 40)
+        print("✅ Please select an option by entering its number ✅\n")
 
         choice = input("Enter your choice: ").strip()
         if choice == "1":
@@ -671,6 +688,7 @@ def accountant_menu():
             break
         else:
             print("Invalid choice. Please try again.")
+
 #-----------------------------------------Omda-----------------------------------------------------------------------
 # Common File Handling Functions
 # Common File Handling Functions
