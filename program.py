@@ -710,6 +710,7 @@ def accountant_menu():
 
 '''
 #-----------------------------------------Omda-----------------------------------------------------------------------
+# Common File Handling Functions
 def reset_user_password():
     """Allows the administrator to reset a user's password."""
     user_id = input("Enter User ID: ").strip()
@@ -795,8 +796,9 @@ def admin_menu(user_email):
         print("3. Add Course")
         print("4. Remove Course")
         print("5. View All Data")
-        print("6. Generate Reports")
-        print("7. Exit")
+        print("6. Manage Lecturers")
+        print("7. Generate Reports")
+        print("8. Exit")
         print("-" * 40)
 
         choice = input("Enter your choice: ").strip()
@@ -809,11 +811,12 @@ def admin_menu(user_email):
         elif choice == '4':
             remove_course()
         elif choice == '5':
-            file_name = input("Enter the file name to view: ").strip()
-            view_all_data(file_name)
+            view_all_data()
         elif choice == '6':
-            report_menu()
+            manage_lecturers()
         elif choice == '7':
+            generate_reports()
+        elif choice == '8':
             print("\nExiting Administrator Menu...")
             break
         else:
@@ -903,60 +906,190 @@ def remove_course():
     """Removes a course from the courses.txt file using its ID."""
     course_id = input("Enter Course ID to Remove: ").strip()
     delete_record('courses.txt', lambda record: record[0] == course_id)
-
-def view_all_data(file_name):
+def manage_lecturers():
     """
-    Displays all the data from a specified file.
-    If the file does not exist, shows an error message.
-    """
-    try:
-        with open(file_name, 'r') as file:
-            data = [line.strip() for line in file.readlines()]
-        
-        if not data:
-            print("\n" + "-" * 40)
-            print(f"Notice: The file '{file_name}' is empty.")
-            print("-" * 40)
-            return
-        
-        print("\n" + "-" * 40)
-        print(f"       Data in '{file_name}'")
-        print("-" * 40)
-        for line in data:
-            print(line)
-        print("-" * 40)
-    except FileNotFoundError:
-        print("\n" + "-" * 40)
-        print(f"Error: The file '{file_name}' does not exist.")
-        print("-" * 40)
-
-
-def report_menu():
-    """
-    Displays the report menu for administrators, allowing selection of a specific report to generate and save to a file.
+    Manage lecturer records, allowing addition, removal, or updating of lecturers.
+    Data is stored in lecturers.txt with the format:
+    Lecturer ID, Lecturer Email, List of Modules
     """
     while True:
-        print("\n--- Generate Reports Menu ---")
-        print("1. Course Enrollment Report")
-        print("2. Student Performance Report")
-        print("3. Fees Collection Report")
-        print("4. Outstanding Fees Report")
-        print("5. Back to Administrator Menu")
+        print("\n" + "-" * 40)
+        print("         Manage Lecturers Menu")
+        print("-" * 40)
+        print("1. Add Lecturer")
+        print("2. Remove Lecturer")
+        print("3. Update Lecturer Information")
+        print("4. Back to Administrator Menu")
+        print("-" * 40)
 
-        choice = input("Enter the report number to generate: ").strip()
+        choice = input("Enter your choice: ").strip()
         if choice == '1':
-            course_enrollment_report()
+            add_lecturer()
         elif choice == '2':
-            student_performance_report()
+            remove_lecturer()
         elif choice == '3':
-            fees_collection_report()
+            update_lecturer()
         elif choice == '4':
-            outstanding_fees_report()
-        elif choice == '5':
-            print("Returning to Administrator Menu...")
+            print("\nReturning to Administrator Menu...")
             break
         else:
-            print("Invalid choice. Please try again.")
+            print("\nInvalid choice. Please try again.")
+
+
+def add_lecturer():
+    """
+    Adds a new lecturer to the lecturers.txt file.
+    Ensures Lecturer ID is unique before appending.
+    """
+    print("\n" + "-" * 40)
+    print("         Add New Lecturer")
+    print("-" * 40)
+
+    lecturer_id = input("Enter Lecturer ID: ").strip()
+    lecturer_email = input("Enter Lecturer Email: ").strip()
+    modules = input("Enter List of Modules (comma-separated): ").strip()
+
+    # Ensure the file exists
+    ensure_file_exists('lecturers.txt', "Lecturer ID,Lecturer Email,List of Modules")
+
+    # Check for duplicate Lecturer ID
+    lecturers = load_file('lecturers.txt')
+    for lecturer in lecturers:
+        if lecturer[0] == lecturer_id:
+            print("\n" + "-" * 40)
+            print(f"Error: A lecturer with ID '{lecturer_id}' already exists.")
+            print("-" * 40)
+            return
+
+    # Append the new lecturer
+    append_to_file('lecturers.txt', [lecturer_id, lecturer_email, modules])
+    print("\n" + "-" * 40)
+    print(f"Success: Lecturer '{lecturer_id}' has been added.")
+    print("-" * 40)
+ 
+def remove_lecturer():
+    """
+    Removes a lecturer from the lecturers.txt file.
+    """
+    print("\n" + "-" * 40)
+    print("         Remove Lecturer")
+    print("-" * 40)
+
+    lecturer_id = input("Enter Lecturer ID to Remove: ").strip()
+
+    # Load lecturers and filter out the one to remove
+    lecturers = load_file('lecturers.txt')
+    updated_lecturers = [lecturer for lecturer in lecturers if lecturer[0] != lecturer_id]
+
+    if len(updated_lecturers) == len(lecturers):
+        print("\n" + "-" * 40)
+        print(f"Error: Lecturer with ID '{lecturer_id}' does not exist.")
+        print("-" * 40)
+    else:
+        save_to_file('lecturers.txt', updated_lecturers)
+        print("\n" + "-" * 40)
+        print(f"Success: Lecturer with ID '{lecturer_id}' has been removed.")
+        print("-" * 40)
+
+
+
+def update_lecturer():
+    """
+    Updates information for an existing lecturer in the lecturers.txt file.
+    Allows changes to email or list of modules.
+    """
+    print("\n" + "-" * 40)
+    print("         Update Lecturer")
+    print("-" * 40)
+
+    lecturer_id = input("Enter Lecturer ID to Update: ").strip()
+
+    # Load lecturers
+    lecturers = load_file('lecturers.txt')
+    for lecturer in lecturers:
+        if lecturer[0] == lecturer_id:
+            print(f"\nFound Lecturer: {lecturer}")
+            new_email = input("Enter New Lecturer Email (leave blank to keep unchanged): ").strip()
+            new_modules = input("Enter New List of Modules (comma-separated, leave blank to keep unchanged): ").strip()
+
+            # Update the lecturer's information
+            if new_email:
+                lecturer[1] = new_email
+            if new_modules:
+                lecturer[2] = new_modules
+
+            # Save the updated list back to the file
+            save_to_file('lecturers.txt', lecturers)
+            print("\n" + "-" * 40)
+            print(f"Success: Lecturer '{lecturer_id}' has been updated.")
+            print("-" * 40)
+            return
+
+    print("\n" + "-" * 40)
+    print(f"Error: Lecturer with ID '{lecturer_id}' not found.")
+    print("-" * 40)
+
+def view_all_data():
+    """
+    Displays the content of all relevant data files on the screen.
+    If a file does not exist, indicates that the file is missing.
+    """
+    files = [
+        "students.txt",
+        "courses.txt",
+        "lecturers.txt",
+        "grades.txt",
+        "attendance.txt",
+        "users.txt",
+        "receipts.txt"
+    ]
+
+    print("\n" + "-" * 40)
+    print("         View All Data")
+    print("-" * 40)
+
+    for file_name in files:
+        print(f"\n--- Data in {file_name} ---")
+        try:
+            # Open the file and read its content
+            with open(file_name, 'r') as file:
+                data = [line.strip() for line in file.readlines()]
+            
+            if data:
+                for line in data:
+                    print(line)
+            else:
+                print("The file is empty.")
+        except FileNotFoundError:
+            print(f"Error: The file '{file_name}' does not exist.")
+        print("-" * 40)
+
+
+
+def generate_reports():
+    """
+    Generates and displays reports on:
+    1. Total Students
+    2. Total Active Courses
+    3. Total Faculty
+    """
+    print("\n" + "-" * 40)
+    print("         Generate Reports")
+    print("-" * 40)
+
+    # Total Students
+    total_students = len(load_file('students.txt')[1:])  # Exclude header row
+    print(f"Total Students: {total_students}")
+
+    # Total Active Courses
+    total_courses = len(load_file('courses.txt')[1:])  # Exclude header row
+    print(f"Total Active Courses: {total_courses}")
+
+    # Total Faculty
+    total_faculty = len(load_file('lecturers.txt')[1:])  # Exclude header row
+    print(f"Total Faculty: {total_faculty}")
+
+    print("-" * 40)
 
 
 
@@ -1099,6 +1232,10 @@ def delete_record(file_name, match_function):
     else:
         save_to_file(file_name, updated_data)
         print("Record(s) deleted successfully!")
+
+
+
+admin_menu("admin@example.com")
 
 
 
