@@ -157,9 +157,10 @@ def authenticate(email, password, users):
                     lecturer_menu(email)
                     break
                 elif role == 'admin':
-                   # admin_menu()
+                    #admin_menu()
                     break
                 elif role == 'accountant':
+                    #accountant_menu()
                     pass
                     break
                 elif role == 'registrar':
@@ -524,7 +525,7 @@ def view_student_grades(lecturer_id):
     input("Press Enter to continue...")
 
 #------------------------------------------------MOHAMMED EISSA--------------------------------------------------
-
+'''
 # Function to check if a student exists
 def student_exists(student_id):
     fees = read_file(FEES_FILE)
@@ -708,7 +709,7 @@ def accountant_menu():
             print("Invalid choice. Please try again.")
     
 
-
+'''
 #-----------------------------------------Omda-----------------------------------------------------------------------
 
 
