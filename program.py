@@ -1619,4 +1619,7 @@ registrar_menu()
 
 #--------------------------------------- Main program entry point--------------------------------------------------
 users = load_users()
+
+print("Welcome to the University Management System (UMS)")
+print("Please login to continue:")
 login(users)
