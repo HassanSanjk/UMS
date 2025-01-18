@@ -673,6 +673,7 @@ def accountant_menu():
             print("Invalid choice. Please try again.")
 #-----------------------------------------Omda-----------------------------------------------------------------------
 # Common File Handling Functions
+# Common File Handling Functions
 def reset_user_password():
     """Allows the administrator to reset a user's password."""
     user_id = input("Enter User ID: ").strip()
@@ -777,12 +778,13 @@ def admin_menu(user_email):
         elif choice == '6':
             manage_lecturers()
         elif choice == '7':
-            generate_reports()
+            generate_reports()  # Updated call
         elif choice == '8':
             print("\nExiting Administrator Menu...")
             break
         else:
             print("\nInvalid choice. Please try again.")
+
 
 def add_student():
     """
@@ -1026,37 +1028,76 @@ def view_all_data():
             print(f"Error: The file '{file_name}' does not exist.")
         print("-" * 40)
 
-
+# Report Functions
 
 def generate_reports():
     """
-    Generates and displays reports on:
+    Displays a menu to generate specific reports:
     1. Total Students
     2. Total Active Courses
     3. Total Faculty
     """
+    while True:
+        print("\n" + "-" * 40)
+        print("         Generate Reports Menu")
+        print("-" * 40)
+        print("1. Total Students Report")
+        print("2. Total Active Courses Report")
+        print("3. Total Faculty Report")
+        print("4. Back to Administrator Menu")
+        print("-" * 40)
+
+        choice = input("Enter your choice: ").strip()
+        if choice == '1':
+            total_students_report()
+        elif choice == '2':
+            total_active_courses_report()
+        elif choice == '3':
+            total_faculty_report()
+        elif choice == '4':
+            print("\nReturning to Administrator Menu...")
+            break
+        else:
+            print("\nInvalid choice. Please try again.")
+
+
+def total_students_report():
+    """
+    Generates and displays the total number of students.
+    """
+    students = load_file('students.txt')
+    total_students = len(students[1:])  # Exclude header row
     print("\n" + "-" * 40)
-    print("         Generate Reports")
+    print("         Total Students Report")
     print("-" * 40)
-
-    # Total Students
-    total_students = len(load_file('students.txt')[1:])  # Exclude header row
     print(f"Total Students: {total_students}")
+    print("-" * 40)
 
-    # Total Active Courses
-    total_courses = len(load_file('courses.txt')[1:])  # Exclude header row
+def total_active_courses_report():
+    """
+    Generates and displays the total number of active courses.
+    """
+    courses = load_file('courses.txt')
+    total_courses = len(courses[1:])  # Exclude header row
+    print("\n" + "-" * 40)
+    print("      Total Active Courses Report")
+    print("-" * 40)
     print(f"Total Active Courses: {total_courses}")
+    print("-" * 40)
 
-    # Total Faculty
-    total_faculty = len(load_file('lecturers.txt')[1:])  # Exclude header row
+def total_faculty_report():
+    """
+    Generates and displays the total number of faculty members.
+    """
+    faculty = load_file('lecturers.txt')
+    total_faculty = len(faculty[1:])  # Exclude header row
+    print("\n" + "-" * 40)
+    print("         Total Faculty Report")
+    print("-" * 40)
     print(f"Total Faculty: {total_faculty}")
-
     print("-" * 40)
 
 
-
-
-# Report Functions
 
 def course_enrollment_report():
     """
@@ -1198,8 +1239,6 @@ def delete_record(file_name, match_function):
 
 
 admin_menu("admin@example.com")
-
-
 
 
 #----------------------------------------------------KHALED------------------------------------------------------------------------
