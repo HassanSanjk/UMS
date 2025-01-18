@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Module ID,Module Name,Program,Credit Hours,Semester
 CS101,Programming Fundamentals,3,1
 CS102,Data Structures,4,2
@@ -13,4 +14,21 @@ BUS101,Principles of Management,3,1
 BUS102,Financial Accounting,4,1
 BUS103,Marketing Management,3,2
 BUS104,Business Economics,4,1
+=======
+Module ID,Module Name,Program,Credit Hours,Semester
+CS101,Programming Fundamentals,3,1
+CS102,Data Structures,4,2
+CS103,Database Systems,3,1
+CS104,Web Development,3,2
+CS105,Software Engineering,4,1
+ENG101,Engineering Mathematics,4,1
+ENG102,Mechanics and Materials,3,1
+ENG103,Thermodynamics,4,2
+ENG104,Circuit Analysis,3,1
+ENG105,Control Systems,4,2
+BUS101,Principles of Management,3,1
+BUS102,Financial Accounting,4,1
+BUS103,Marketing Management,3,2
+BUS104,Business Economics,4,1
+>>>>>>> 8af85900a3ab7e965508029c1108dd6b1baef8bd
 BUS105,Corporate Finance,4,2
