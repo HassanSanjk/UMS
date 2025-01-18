@@ -1561,8 +1561,8 @@ def student_menu(email):
     student_name = student[1]
     
     while True:
-        print(f"\n======== Welcome {student_name.ljust(15)} ========")
-        print("|    1. View Available Modules         |")
+        print(f"\n===== Welcome {student_name.ljust(15)} =====")
+        print("|    1. View Available Modules        |")
         print("|    2. Enroll in Module              |")
         print("|    3. View Grades                   |")
         print("|    4. View Attendance               |")
