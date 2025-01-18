@@ -1,9 +1,9 @@
 StudentID,Name,Email,Modules,totalFees,outstandingFees
-S001,John Doe,johndoe@example.com,CS101 CS102,10000.0,0.0
-S002,Jane Smith,janesmith@example.com,CS103,10000.0,3000.0
-S003,Michael Brown,mbrown@example.com,CS101 CS102 CS103,12000.0,4000.0
-S004,Sarah Wilson,swilson@example.com,CS101 CS103,10000.0,2500.0
-S005,David Lee,dlee@example.com,CS102 CS103,11000.0,1000.0
-S006,Emma Davis,edavis@example.com,CS101 CS102,10000.0,5000.0
+S001,John Doe,johndoe@example.com,CS101 CS102,10000.0,0.00
+S002,Jane Smith,janesmith@example.com,CS103,10000.0,0.00
+S003,Michael Brown,mbrown@example.com,CS101 CS102 CS103,12000.0,3000.00
+S004,Sarah Wilson,swilson@example.com,CS101 CS103,10000.0,500.00
+S005,David Lee,dlee@example.com,CS102 CS103,11000.0,500.00
+S006,Emma Davis,edavis@example.com,CS101 CS102,10000.0,3000.00
 S007,James Taylor,jtaylor@example.com,CS102 CS103,10000.0,0.0
 S008,Alice Johnson,ajohnson@example.com,CS101 CS103,10000.0,2000.0
