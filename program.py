@@ -157,14 +157,13 @@ def authenticate(email, password, users):
                     lecturer_menu(email)
                     break
                 elif role == 'admin':
-                    #admin_menu()
+                    admin_menu("admin@example.com")
                     break
                 elif role == 'accountant':
-                    #accountant_menu()
                     pass
                     break
                 elif role == 'registrar':
-                    print("Registrar menu not implemented yet")
+                    registrar_menu()
                     break
                 else:
                     print("Invalid role. Please contact administrator.")
@@ -711,6 +710,397 @@ def accountant_menu():
 
 '''
 #-----------------------------------------Omda-----------------------------------------------------------------------
+def reset_user_password():
+    """Allows the administrator to reset a user's password."""
+    user_id = input("Enter User ID: ").strip()
+    new_password = input("Enter New Password: ").strip()
+
+    users = load_file('users.txt')
+    user_found = False
+    for user in users:
+        if user[0] == user_id:
+            user[1] = new_password
+            user_found = True
+
+    if user_found:
+        save_to_file('users.txt', users)
+        print("Password reset successfully!")
+    else:
+        print("User ID not found.")
+
+
+
+def ensure_file_exists(file_name, header=None):
+    """Ensures the specified file exists. Creates it with an optional header if not."""
+    try:
+        with open(file_name, 'r'):
+            pass
+    except FileNotFoundError:
+        with open(file_name, 'w') as file:
+            if header:
+                file.write(header + '\n')
+
+def load_file(file_name):
+    """
+    Reads data from a file and returns a list of records.
+    Ensures the file exists before attempting to read.
+    """
+    try:
+        with open(file_name, 'r') as file:
+            return [line.strip().split(',') for line in file.readlines() if line.strip()]
+    except FileNotFoundError:
+        print(f"\n----------------------------------------")
+        print(f"Error: File '{file_name}' does not exist.")
+        print("----------------------------------------")
+        return []
+
+
+def save_to_file(file_name, data):
+    """
+    Overwrites the specified file with new data.
+    """
+    try:
+        with open(file_name, 'w') as file:
+            for record in data:
+                file.write(','.join(record) + '\n')
+    except Exception as e:
+        print(f"\n----------------------------------------")
+        print(f"Error: Could not write to {file_name}. Reason: {e}")
+        print("----------------------------------------")
+
+
+def append_to_file(file_name, record):
+    """
+    Appends a single record to a file.
+    """
+    try:
+        with open(file_name, 'a') as file:
+            file.write(','.join(record) + '\n')
+    except Exception as e:
+        print(f"\n----------------------------------------")
+        print(f"Error: Could not append to {file_name}. Reason: {e}")
+        print("----------------------------------------")
+
+def admin_menu(user_email):
+    """
+    Displays the Administrator menu.
+    """
+    while True:
+        print("\n" + "-" * 40)
+        print("         Administrator Menu")
+        print("-" * 40)
+        print(f"Logged in as: {user_email}")
+        print("1. Add Student")
+        print("2. Remove Student")
+        print("3. Add Course")
+        print("4. Remove Course")
+        print("5. View All Data")
+        print("6. Generate Reports")
+        print("7. Exit")
+        print("-" * 40)
+
+        choice = input("Enter your choice: ").strip()
+        if choice == '1':
+            add_student()
+        elif choice == '2':
+            remove_student()
+        elif choice == '3':
+            add_course()
+        elif choice == '4':
+            remove_course()
+        elif choice == '5':
+            file_name = input("Enter the file name to view: ").strip()
+            view_all_data(file_name)
+        elif choice == '6':
+            report_menu()
+        elif choice == '7':
+            print("\nExiting Administrator Menu...")
+            break
+        else:
+            print("\nInvalid choice. Please try again.")
+
+def add_student():
+    """
+    Adds a new student to the students.txt file.
+    """
+    print("\n" + "-" * 40)
+    print("         Add New Student Menu")
+    print("-" * 40)
+    
+    student_id = input("Enter Student ID: ").strip()
+    student_name = input("Enter Student Name: ").strip()
+    student_email = input("Enter Student Email: ").strip()
+    enrolled_courses = input("Enter Enrolled Courses (comma-separated): ").strip()
+    total_fees = input("Enter Total Fees: ").strip()
+    outstanding_fees = input("Enter Outstanding Fees: ").strip()
+
+    ensure_file_exists('students.txt', "Student ID,Student Name,Student Email,Enrolled Courses,Total Fees,Outstanding Fees")
+
+    students = load_file('students.txt')
+    for student in students:
+        if student[0] == student_id:
+            print("\n" + "-" * 40)
+            print(f"Error: Student with ID '{student_id}' already exists.")
+            print("-" * 40)
+            return
+
+    append_to_file('students.txt', [student_id, student_name, student_email, enrolled_courses, total_fees, outstanding_fees])
+    print("\n" + "-" * 40)
+    print(f"Success: Student '{student_name}' has been added.")
+    print("-" * 40)
+
+def remove_student():
+    """
+    Removes a student from the students.txt file.
+    """
+    print("\n" + "-" * 40)
+    print("         Remove Student Menu")
+    print("-" * 40)
+    
+    student_id = input("Enter the Student ID to Remove: ").strip()
+    students = load_file('students.txt')
+    updated_students = [student for student in students if student[0] != student_id]
+
+    if len(updated_students) == len(students):
+        print("\n" + "-" * 40)
+        print(f"Error: Student with ID '{student_id}' does not exist.")
+        print("-" * 40)
+    else:
+        save_to_file('students.txt', updated_students)
+        print("\n" + "-" * 40)
+        print(f"Success: Student with ID '{student_id}' has been removed.")
+        print("-" * 40)
+
+def add_course():
+    """
+    Adds a new course to the courses.txt file.
+    """
+    print("\n" + "-" * 40)
+    print("         Add New Course Menu")
+    print("-" * 40)
+    
+    course_id = input("Enter Module ID (e.g., CS101): ").strip()
+    course_name = input("Enter Course Name: ").strip()
+    credit_hours = input("Enter Credit Hours: ").strip()
+    semester = input("Enter Semester: ").strip()
+
+    ensure_file_exists('courses.txt', "Module ID,Module Name,Credit Hours,Semester")
+
+    courses = load_file('courses.txt')
+    for course in courses:
+        if course[0] == course_id:
+            print("\n" + "-" * 40)
+            print(f"Error: Course with ID '{course_id}' already exists.")
+            print("-" * 40)
+            return
+
+    append_to_file('courses.txt', [course_id, course_name, credit_hours, semester])
+    print("\n" + "-" * 40)
+    print(f"Success: Course '{course_name}' has been added.")
+    print("-" * 40)
+
+def remove_course():
+    """Removes a course from the courses.txt file using its ID."""
+    course_id = input("Enter Course ID to Remove: ").strip()
+    delete_record('courses.txt', lambda record: record[0] == course_id)
+
+def view_all_data(file_name):
+    """
+    Displays all the data from a specified file.
+    If the file does not exist, shows an error message.
+    """
+    try:
+        with open(file_name, 'r') as file:
+            data = [line.strip() for line in file.readlines()]
+        
+        if not data:
+            print("\n" + "-" * 40)
+            print(f"Notice: The file '{file_name}' is empty.")
+            print("-" * 40)
+            return
+        
+        print("\n" + "-" * 40)
+        print(f"       Data in '{file_name}'")
+        print("-" * 40)
+        for line in data:
+            print(line)
+        print("-" * 40)
+    except FileNotFoundError:
+        print("\n" + "-" * 40)
+        print(f"Error: The file '{file_name}' does not exist.")
+        print("-" * 40)
+
+
+def report_menu():
+    """
+    Displays the report menu for administrators, allowing selection of a specific report to generate and save to a file.
+    """
+    while True:
+        print("\n--- Generate Reports Menu ---")
+        print("1. Course Enrollment Report")
+        print("2. Student Performance Report")
+        print("3. Fees Collection Report")
+        print("4. Outstanding Fees Report")
+        print("5. Back to Administrator Menu")
+
+        choice = input("Enter the report number to generate: ").strip()
+        if choice == '1':
+            course_enrollment_report()
+        elif choice == '2':
+            student_performance_report()
+        elif choice == '3':
+            fees_collection_report()
+        elif choice == '4':
+            outstanding_fees_report()
+        elif choice == '5':
+            print("Returning to Administrator Menu...")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+
+
+
+# Report Functions
+
+def course_enrollment_report():
+    """
+    Generates and saves a report showing the number of students enrolled in each course.
+    Report File: course_enrollment_report.txt
+    """
+    students = load_file('students.txt')
+    courses = load_file('courses.txt')
+
+    # Create a dictionary to track enrollments for each course
+    enrollment_count = {}
+    for student in students[1:]:  # Skip header row
+        enrolled_courses = student[3].split(',')  # List of courses student is enrolled in
+        for course in enrolled_courses:
+            course = course.strip()
+            if course:  # Ignore empty course entries
+                enrollment_count[course] = enrollment_count.get(course, 0) + 1
+
+    # Generate the report
+    report_lines = ["--- Course Enrollment Report ---"]
+    for course in courses[1:]:  # Skip header row
+        course_id = course[0]
+        course_name = course[1]
+        enrolled = enrollment_count.get(course_id, 0)
+        report_lines.append(f"Course: {course_name} ({course_id}), Enrolled Students: {enrolled}")
+
+    # Save the report to a file
+    save_to_file('course_enrollment_report.txt', [[line] for line in report_lines])
+    print("Course Enrollment Report generated and saved to 'course_enrollment_report.txt'")
+def student_performance_report():
+    """
+    Generates and saves a performance report for each course with grade statistics.
+    Report File: student_performance_report.txt
+    """
+    grades = load_file('grades.txt')
+
+    # Create a dictionary to store grades per course
+    course_grades = {}
+    for entry in grades[1:]:  # Skip header row
+        course = entry[1]
+        if entry[2].replace('.', '', 1).isdigit():  # Validate grade is numeric
+            grade = float(entry[2])
+            course_grades.setdefault(course, []).append(grade)
+
+    # Generate the report
+    report_lines = ["--- Student Performance Report ---"]
+    for course, grade_list in course_grades.items():
+        if grade_list:  # Ensure the course has grades
+            average_grade = sum(grade_list) / len(grade_list)
+            highest_grade = max(grade_list)
+            lowest_grade = min(grade_list)
+            report_lines.append(f"Course: {course}")
+            report_lines.append(f"  Average Grade: {average_grade:.2f}%")
+            report_lines.append(f"  Highest Grade: {highest_grade:.2f}%")
+            report_lines.append(f"  Lowest Grade: {lowest_grade:.2f}%")
+
+    # Save the report to a file
+    save_to_file('student_performance_report.txt', [[line] for line in report_lines])
+    print("Student Performance Report generated and saved to 'student_performance_report.txt'")
+
+
+
+def fees_collection_report():
+    """
+    Generates and saves a report summarizing total fees collected and outstanding fees.
+    Report File: fees_collection_report.txt
+    """
+    students = load_file('students.txt')
+
+    total_collected = 0
+    total_outstanding = 0
+    fully_paid_count = 0
+
+    # Calculate totals while skipping invalid rows
+    for student in students[1:]:  # Skip header row
+        if (student[4].replace('.', '', 1).isdigit() and student[5].replace('.', '', 1).isdigit()):
+            total_fees = float(student[4])
+            outstanding_fees = float(student[5])
+            total_collected += (total_fees - outstanding_fees)
+            total_outstanding += outstanding_fees
+            if outstanding_fees == 0:
+                fully_paid_count += 1
+
+    # Generate the report
+    report_lines = [
+        "--- Fees Collection Report ---",
+        f"Total Fees Collected: MYR{total_collected:.2f}",
+        f"Total Outstanding Fees: MYR{total_outstanding:.2f}",
+        f"Students Fully Paid: {fully_paid_count}"
+    ]
+
+    # Save the report to a file
+    save_to_file('fees_collection_report.txt', [[line] for line in report_lines])
+    print("Fees Collection Report generated and saved to 'fees_collection_report.txt'")
+
+
+def outstanding_fees_report():
+    """
+    Generates and saves a list of students with outstanding fees.
+    Report File: outstanding_fees_report.txt
+    """
+    students = load_file('students.txt')
+
+    # Sort students by outstanding fees in descending order
+    students_with_fees = sorted(
+        [
+            student for student in students[1:]  # Skip header row
+            if student[5].replace('.', '', 1).isdigit() and float(student[5]) > 0
+        ],
+        key=lambda x: float(x[5]),
+        reverse=True
+    )
+
+    # Generate the report
+    report_lines = ["--- Outstanding Fees Report ---"]
+    for student in students_with_fees:
+        student_id = student[0]
+        student_name = student[1]
+        outstanding_fees = float(student[5])
+        report_lines.append(f"Student ID: {student_id}, Name: {student_name}, Outstanding Fees: MYR{outstanding_fees:.2f}")
+
+    # Save the report to a file
+    save_to_file('outstanding_fees_report.txt', [[line] for line in report_lines])
+    print("Outstanding Fees Report generated and saved to 'outstanding_fees_report.txt'")
+
+
+
+
+def delete_record(file_name, match_function):
+    """Deletes records matching a condition in the file."""
+    data = load_file(file_name)
+    updated_data = [record for record in data if not match_function(record)]
+    if len(data) == len(updated_data):
+        print("No matching records found.")
+    else:
+        save_to_file(file_name, updated_data)
+        print("Record(s) deleted successfully!")
+
+
 
 
 #----------------------------------------------------KHALED------------------------------------------------------------------------
@@ -881,23 +1271,8 @@ def student_menu(email):
 
 
 #---------------------------------------------------HUSSEIN-----------------------------------------------------------------------------------
-# Dictionary to store student data
+# # Dictionary to store student data
 students = {}
-
-# User guide for the system
-USER_GUIDE = """
-Welcome to the Registrar System!
-
-This system allows you to:
-1. Register a new student with their details and enrolled course.
-2. View the information of a specific student by entering their ID.
-3. Update the personal details or enrolled course of an existing student.
-4. Manage course enrollment by enrolling in or withdrawing from a course.
-5. Generate and issue a transcript for a student.
-6. Generate a report listing all registered students and their details.
-
-Follow the prompts to use these features effectively.
-"""
 
 # Function to register a new student
 def register_student(student_id, first_name, last_name, course_enrolled):
@@ -969,11 +1344,8 @@ def generate_report():
     return report
 
 # Main function to run the system
-def main():
-    print("Welcome to the Registrar System!")
-    guide_choice = input("Do you want to view the User Guide? (yes/no): ").strip().lower()
-    if guide_choice == "yes":
-        print(USER_GUIDE)
+def registrar_menu():
+    print("Welcome to the Registrar system!")
     
     while True:
         print("\nMenu:")
@@ -1023,13 +1395,6 @@ def main():
         
         else:
             print("Invalid choice. Please try again.")
-
-# Run the main function
-if __name__ == "__main__":
-    main()
-
-
-
 
 #--------------------------------------- Main program entry point--------------------------------------------------
 users = load_users()
