@@ -546,7 +546,7 @@ def view_student_grades(lecturer_id):
     # Displaying headers
     print(f"\n============== Grade Report for {module['course_code']} ================")
     print(f"ID".ljust(10)+"Name".ljust(25)+"Marks".ljust(10)+"Grade")
-    print("-" * 70)
+    print("-" * 55)
     
     for grade in grades:
         student = get_student_details(grade['student_id'])
@@ -569,7 +569,7 @@ def view_student_grades(lecturer_id):
     print(f"Class Average: {avg:.2f}")
     print(f"Highest Mark: {highest}")
     print(f"Lowest Mark: {lowest}")
-    print("-" * 70)
+    print("-" * 55)
     input("Press Enter to continue...")
 
 #---------------------------------------------------ACCOUNTANT MENU--------------------------------------------------------------------------------
