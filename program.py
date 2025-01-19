@@ -219,17 +219,20 @@ def login(users):
 def get_courses(course_codes):
     if not course_codes:
         return []
-        
+      
     codes = course_codes.strip().split()
-    courses = []
+
     all_courses = read_file(COURSES_FILE)
     
+    courses_list = []
     for code in codes:
         for course in all_courses:
             if course[0] == code:
-                courses.append(course)
+                courses_list.append(course)
                 break
-    
+
+    # Returning as tuple for faster access and immutable
+    courses = tuple(courses_list)
     return courses
 
 # Function to select a module from lecturer's assigned courses
