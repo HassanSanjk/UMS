@@ -99,8 +99,8 @@ def update_student_fees(student_id, payment_amount):
     return False
 
 # Function to get list of students enrolled in a course and return them in a list
-def get_enrolled_students(course_code, semester):
-    """Get list of students enrolled in a specific course with updated structure"""
+def get_enrolled_students(course_code):
+
     students = []
     for line in read_file(STUDENTS_FILE):
         if len(line) >= 6: 
@@ -163,7 +163,6 @@ def load_users():
 
 # Function to authenticate user and redirect them to their respective menu
 def authenticate(email, password, users):
-    """Authenticate user and redirect to appropriate menu"""
     if not email or not password:
         print("Email and password cannot be empty")
         return
@@ -210,7 +209,7 @@ def login(users):
             print("Please enter a valid email address")
             continue
         break
-        
+    
     password = input("Enter password: ").strip()
     authenticate(email, password, users)
 
@@ -264,7 +263,7 @@ def select_module(lecturer_id):
                 return None
 
 # Function to get all grades in a specific module
-def get_module_grades(course_code, semester):
+def get_module_grades(course_code):
     grades = []
     # Iterating through the grades file
     for line in read_file(GRADES_FILE):
@@ -305,7 +304,7 @@ def calculate_grade(marks):
         return 'F'
 
 # Function to update grade for a specific student
-def update_grade(student_id, course_code, semester, marks, grade_letter):
+def update_grade(student_id, course_code, marks, grade_letter):
     grades = read_file(GRADES_FILE)
     updated = False
     new_grades = []
@@ -330,7 +329,7 @@ def update_grade(student_id, course_code, semester, marks, grade_letter):
     input("Press Enter to continue...")
 
 # Function to record attendance
-def record_attendance(date, course_code, student_id, status, lecturer_id):
+def record_attendance(date, course_code, student_id, status):
 
     attendance_entry = f"{course_code},{student_id},{date},{status}\n"
     
@@ -347,7 +346,7 @@ def record_attendance(date, course_code, student_id, status, lecturer_id):
     # Adding new attendance entry to the file
     append_file(ATTENDANCE_FILE, [attendance_entry])
     print(f"\nAttendance recorded for student {student_id}")
-    input("Press Enter to continue...")
+
 
 # Function to display the main lecturer menu
 def lecturer_menu(email):
@@ -417,7 +416,7 @@ def record_grades(lecturer_id):
     if not module:
         return
 
-    students = get_enrolled_students(module['course_code'], module['semester'])
+    students = get_enrolled_students(module['course_code'])
     if not students:
         print("\nNo students enrolled in this module.")
         input("Press Enter to continue...")
@@ -429,7 +428,7 @@ def record_grades(lecturer_id):
     print(f"Student ID".ljust(15) + "Name".ljust(25) + "Current Grade")
     print("-" * 55)
     
-    current_grades = get_module_grades(module['course_code'], module['semester'])
+    current_grades = get_module_grades(module['course_code'])
     grades_dict = {grade['student_id']: grade['marks'] for grade in current_grades}
     
     for student in students:
@@ -453,7 +452,7 @@ def record_grades(lecturer_id):
                     grade_letter = calculate_grade(marks)
                     
                     #Updating grade
-                    update_grade(student['id'], module['course_code'], module['semester'], marks, grade_letter)
+                    update_grade(student['id'], module['course_code'], marks, grade_letter)
                     break
                 else:
                     print("Marks must be between 0 and 100")
@@ -468,7 +467,7 @@ def view_student_list(lecturer_id):
     if not module:
         return
     
-    students = get_enrolled_students(module['course_code'], module['semester'])
+    students = get_enrolled_students(module['course_code'])
     if not students:
         print("\nNo students enrolled in this module.")
         input("Press Enter to continue...")
@@ -495,7 +494,7 @@ def track_attendance(lecturer_id):
     if not module:
         return
         
-    students = get_enrolled_students(module['course_code'], module['semester'])
+    students = get_enrolled_students(module['course_code'])
     if not students:
         print("\nNo students enrolled in this module.")
         input("Press Enter to continue...")
@@ -519,10 +518,13 @@ def track_attendance(lecturer_id):
                 full_status = {'P': 'Present', 'A': 'Absent', 'L': 'Late'}[status]
 
                 # Recording attendance
-                record_attendance(date, module['course_code'], student['id'], full_status, lecturer_id)
+                record_attendance(date, module['course_code'], student['id'], full_status)
                 break
             else:
                 print("Invalid input. Please use P, A, or L.")
+        print("-" * 60)
+    print("Attendance updated for module:", module['course_code'])
+    input("Press Enter to continue...")
 
 # Function to view student grades
 def view_student_grades(lecturer_id):
@@ -532,7 +534,7 @@ def view_student_grades(lecturer_id):
     if not module:
         return
         
-    grades = get_module_grades(module['course_code'], module['semester'])
+    grades = get_module_grades(module['course_code'])
     if not grades:
         print("\nNo grades recorded for this module.")
         input("Press Enter to continue...")
@@ -1791,4 +1793,10 @@ print("Welcome to the University Management System (UMS)")
 users = load_users()
 # calling Login function
 print("Please login to continue:")
-login(users)
+
+while True:
+    login(users)
+    print("Do you want to login again? (yes/no)")
+    choice = input().lower()
+    if not choice == "yes":
+        break
