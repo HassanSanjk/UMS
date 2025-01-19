@@ -329,7 +329,6 @@ def update_grade(student_id, course_code, marks, grade_letter):
     
     write_file(GRADES_FILE, new_grades)
     print(f"\nGrade updated for student {student_id}")
-    input("Press Enter to continue...")
 
 # Function to record attendance
 def record_attendance(date, course_code, student_id, status):
@@ -456,6 +455,7 @@ def record_grades(lecturer_id):
                     
                     #Updating grade
                     update_grade(student['id'], module['course_code'], marks, grade_letter)
+                    input("All grades updated successfully!\nPress Enter to continue...")
                     break
                 else:
                     print("Marks must be between 0 and 100")
