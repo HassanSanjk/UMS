@@ -170,7 +170,7 @@ def authenticate(email, password, users):
     if email in users:
         if users[email]['password'] == password:
             role = users[email]['role']
-            print(f"\nLogin successful! Welcome, {email}")
+            print(f"\nLogin successful! ")
             while True:
                 if role == 'student':
                     student_menu(email)
@@ -179,7 +179,7 @@ def authenticate(email, password, users):
                     lecturer_menu(email)
                     break
                 elif role == 'admin':
-                    admin_menu("admin@example.com")
+                    admin_menu(email)
                     break
                 elif role == 'accountant':
                     accountant_menu()
@@ -268,6 +268,8 @@ def get_module_grades(course_code, semester):
     grades = []
     # Iterating through the grades file
     for line in read_file(GRADES_FILE):
+        if len(line) < 4:
+            continue
         student_id, module, marks, grade_letter = line
         # Checking if the module ID matches
         if module == course_code:
@@ -1297,7 +1299,6 @@ def delete_record(file_name, match_function):
 
 
 
-admin_menu("admin@example.com")
 
 
 #----------------------------------------------------STUDENT MENU-------------------------------------------------------------------------------
@@ -1782,9 +1783,6 @@ def registrar_menu():
             break
         else:
             print("Invalid choice. Please try again.")
-
-# Start the registrar menu
-registrar_menu()
 
 #--------------------------------------- Main program entry point--------------------------------------------------
 
