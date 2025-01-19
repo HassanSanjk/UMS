@@ -197,7 +197,7 @@ def authenticate(email, password, users):
 
 # Function to display login menu
 def login(users):
-    print("\n----- Login -----")
+    print("\n---------- Login ----------")
     while True:
         email = input("Enter email: ").strip()
 
