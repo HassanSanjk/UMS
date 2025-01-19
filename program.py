@@ -740,6 +740,7 @@ def accountant_menu():
 
 #-------------------------------------------ADMINISTRATOR MENU----------------------------------------------------------------------------------
 
+# Common File Handling Functions
 def reset_user_password():
     """Allows the administrator to reset a user's password."""
     user_id = input("Enter User ID: ").strip()
@@ -801,15 +802,17 @@ def save_to_file(file_name, data):
 
 def append_to_file(file_name, record):
     """
-    Appends a single record to a file.
+    Appends a single record to a file with proper formatting.
+    Args:
+        file_name (str): The name of the file to append to.
+        record (list): A list of values representing a single record.
     """
     try:
         with open(file_name, 'a') as file:
-            file.write(','.join(record) + '\n')
+            file.write(', '.join(record) + '\n')  # Properly formatted with commas and line breaks
     except Exception as e:
-        print(f"\n----------------------------------------")
-        print(f"Error: Could not append to {file_name}. Reason: {e}")
-        print("----------------------------------------")
+        print(f"\nError: Could not append to {file_name}. Reason: {e}")
+
 
 def admin_menu(user_email):
     """
@@ -854,33 +857,45 @@ def admin_menu(user_email):
 
 def add_student():
     """
-    Adds a new student to the students.txt file.
+    Adds a new student to the students.txt file and registers them in users.txt.
+    Student ID is assigned automatically.
     """
     print("\n" + "-" * 40)
     print("         Add New Student Menu")
     print("-" * 40)
-    
-    student_id = input("Enter Student ID: ").strip()
+
+    # Input student details
     student_name = input("Enter Student Name: ").strip()
     student_email = input("Enter Student Email: ").strip()
     enrolled_courses = input("Enter Enrolled Courses (comma-separated): ").strip()
     total_fees = input("Enter Total Fees: ").strip()
     outstanding_fees = input("Enter Outstanding Fees: ").strip()
 
+    # Ensure the files exist
     ensure_file_exists('students.txt', "Student ID,Student Name,Student Email,Enrolled Courses,Total Fees,Outstanding Fees")
+    ensure_file_exists('users.txt', "Email,Password,Role")
 
+    # Load existing students to determine the next Student ID
     students = load_file('students.txt')
-    for student in students:
-        if student[0] == student_id:
-            print("\n" + "-" * 40)
-            print(f"Error: Student with ID '{student_id}' already exists.")
-            print("-" * 40)
-            return
+    if len(students) > 1:
+        last_id = students[-1][0]  # Get the last student ID
+        next_id = "S" + str(int(last_id[1:]) + 1)  # Increment numeric part of the ID
+    else:
+        next_id = "S001"  # Default ID if the file is empty
 
-    append_to_file('students.txt', [student_id, student_name, student_email, enrolled_courses, total_fees, outstanding_fees])
+    # Append the new student to students.txt
+    append_to_file('students.txt', [next_id, student_name, student_email, enrolled_courses, total_fees, outstanding_fees])
+
+    # Add the student to users.txt with a default password and "Student" role
+    default_password = "password123"
+    append_to_file('users.txt', [student_email, default_password, "Student"])
+
+    # Confirmation message
     print("\n" + "-" * 40)
-    print(f"Success: Student '{student_name}' has been added.")
+    print(f"Success: Student '{student_name}' has been added with ID '{next_id}' and registered as a user.")
     print("-" * 40)
+
+
 
 def remove_student():
     """
@@ -906,36 +921,41 @@ def remove_student():
 
 def add_course():
     """
-    Adds a new course to the courses.txt file.
+    Adds a new course to the courses.txt file with an automatically assigned ID.
     """
     print("\n" + "-" * 40)
     print("         Add New Course Menu")
     print("-" * 40)
-    
-    course_id = input("Enter Module ID (e.g., CS101): ").strip()
+
+    # Input course details
     course_name = input("Enter Course Name: ").strip()
     credit_hours = input("Enter Credit Hours: ").strip()
     semester = input("Enter Semester: ").strip()
 
+    # Ensure the file exists
     ensure_file_exists('courses.txt', "Module ID,Module Name,Credit Hours,Semester")
 
+    # Load existing courses to determine the next Course ID
     courses = load_file('courses.txt')
-    for course in courses:
-        if course[0] == course_id:
-            print("\n" + "-" * 40)
-            print(f"Error: Course with ID '{course_id}' already exists.")
-            print("-" * 40)
-            return
+    if len(courses) > 1:
+        last_id = courses[-1][0]  # Get the last course ID
+        numeric_part = int(last_id[2:]) + 1  # Increment numeric part of the ID
+        next_id = f"CS{numeric_part:03d}"  # Format as CS001, CS002, etc.
+    else:
+        next_id = "CS001"  # Default ID if the file is empty
 
-    append_to_file('courses.txt', [course_id, course_name, credit_hours, semester])
+    # Append the new course to the file
+    append_to_file('courses.txt', [next_id, course_name, credit_hours, semester])
     print("\n" + "-" * 40)
-    print(f"Success: Course '{course_name}' has been added.")
+    print(f"Success: Course '{course_name}' has been added with ID '{next_id}'.")
     print("-" * 40)
+
 
 def remove_course():
     """Removes a course from the courses.txt file using its ID."""
     course_id = input("Enter Course ID to Remove: ").strip()
     delete_record('courses.txt', lambda record: record[0] == course_id)
+
 def manage_lecturers():
     """
     Manage lecturer records, allowing addition, removal, or updating of lecturers.
@@ -1062,7 +1082,6 @@ def update_lecturer():
 def view_all_data():
     """
     Displays the content of all relevant data files on the screen.
-    If a file does not exist, indicates that the file is missing.
     """
     files = [
         "students.txt",
@@ -1081,7 +1100,6 @@ def view_all_data():
     for file_name in files:
         print(f"\n--- Data in {file_name} ---")
         try:
-            # Open the file and read its content
             with open(file_name, 'r') as file:
                 data = [line.strip() for line in file.readlines()]
             
@@ -1093,6 +1111,7 @@ def view_all_data():
         except FileNotFoundError:
             print(f"Error: The file '{file_name}' does not exist.")
         print("-" * 40)
+
 
 # Report Functions
 
@@ -1304,7 +1323,7 @@ def delete_record(file_name, match_function):
 
 
 
-
+admin_menu("admin@example.com")
 
 #----------------------------------------------------STUDENT MENU-------------------------------------------------------------------------------
 # Constants for file paths and valid status values remain the same...
