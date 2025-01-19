@@ -455,12 +455,13 @@ def record_grades(lecturer_id):
                     
                     #Updating grade
                     update_grade(student['id'], module['course_code'], marks, grade_letter)
-                    input("All grades updated successfully!\nPress Enter to continue...")
                     break
                 else:
                     print("Marks must be between 0 and 100")
             except ValueError:
                 print("Please enter a valid number")
+    
+    input("All grades updated successfully!\nPress Enter to continue...")
 
 # Function to view student list
 def view_student_list(lecturer_id):
