@@ -1324,8 +1324,6 @@ def delete_record(file_name, match_function):
 
 
 
-admin_menu("admin@example.com")
-
 #----------------------------------------------------STUDENT MENU-------------------------------------------------------------------------------
 # Constants for file paths and valid status values remain the same...
 
