@@ -402,7 +402,7 @@ def view_assigned_modules(lecturer_id):
             courses = get_courses(course_code)
             
             # Displaying assigned modules with headers
-            print(f"\n================== Assigned Modules for {l_name} ====================")
+            print(f"\n================ Assigned Modules for {l_name} ==================")
             print(f"Course Code".ljust(15) + "Course Name".ljust(25) + "Credit Hours".ljust(15) + "Semester")
             print("-" * 70)
             for course in courses:
@@ -544,7 +544,7 @@ def view_student_grades(lecturer_id):
         return
         
     # Displaying headers
-    print(f"\n=== Grade Report for {module['course_code']} ===")
+    print(f"\n============== Grade Report for {module['course_code']} ================")
     print(f"ID".ljust(10)+"Name".ljust(25)+"Marks".ljust(10)+"Grade")
     print("-" * 70)
     
