@@ -565,7 +565,7 @@ def view_student_grades(lecturer_id):
     else:
         avg = highest = lowest = 0
     
-    print("-" * 70)
+    print("-" * 55)
     print(f"Class Average: {avg:.2f}")
     print(f"Highest Mark: {highest}")
     print(f"Lowest Mark: {lowest}")
