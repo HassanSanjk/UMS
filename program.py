@@ -1,5 +1,7 @@
 #University Management System
 #-------------------------------------------------------------------------------Common Functions------------------------------------------------------------------------------
+
+# Constants for file paths
 STUDENTS_FILE = "students.txt"
 COURSES_FILE = "courses.txt"
 LECTURERS_FILE = "lecturers.txt"
@@ -8,16 +10,15 @@ GRADES_FILE = "grades.txt"
 USERS_FILE = "users.txt"
 RECEIPTS_FILE = "receipts.txt"
 
-VALID_ROLES = ['student', 'lecturer', 'admin', 'accountant', 'registrar']
-VALID_ATTENDANCE_STATUS = ['Present', 'Absent', 'Late']
-
-# Function to read data from a file
+# Function to read data from a file that returns a list of lists
 def read_file(file_path):
     try:
         with open(file_path, 'r') as file:
+            # Skip the header
             next(file)
             data = []
             for line in file:
+                # read each line and split it into a list and append it to the data list
                 data.append(line.strip().split(","))
         return data
     except FileNotFoundError:
@@ -35,19 +36,26 @@ def write_file(file_path, data):
     except Exception as e:
         print(f"Error writing to {file_path}: {e}")
 
+# Function to append data to a file
 def append_file(file_path, data):
     try:
         with open(file_path, 'a') as file:
             file.writelines(data)
     except Exception as e:
-        print(f"Error writing to {file_path}: {e}")
+        print(f"Error appending to {file_path}: {e}")
 
+# Function to get student details and return it in a dictionary
 def get_student_details(student_id):
-    """Get student details from students.txt with updated structure"""
+
+    #iterating over each line in the students file
     for line in read_file(STUDENTS_FILE):
-        if len(line) >= 6:  # Updated to check for new file structure
+        if len(line) >= 6:
             s_id, name, email, enrolled_courses, total_fees, outstanding_fees = line
+
+            # Check if the student ID matches
             if s_id == student_id:
+
+                # Return the student details
                 return {
                     'id': s_id,
                     'name': name,
@@ -59,15 +67,19 @@ def get_student_details(student_id):
                 }
     return None
 
+# Function to update student fees after payment
 def update_student_fees(student_id, payment_amount):
-    """Update student fees in students.txt after payment"""
     students = read_file(STUDENTS_FILE)
+
     new_students = ["StudentID,Name,Email,EnrolledCourses,TotalFees,OutstandingFees\n"]
     updated = False
     
     for student in students:
+        # Checking if the student ID matches
         if len(student) >= 6 and student[0] == student_id:
             outstanding = float(student[5]) - payment_amount
+            
+            # Update the outstanding fees
             new_line = f"{student[0]},{student[1]},{student[2]},{student[3]},{student[4]},{outstanding}\n"
             new_students.append(new_line)
             updated = True
@@ -86,12 +98,12 @@ def update_student_fees(student_id, payment_amount):
         return True
     return False
 
-# Update the existing functions to work with new structure
+# Function to get list of students enrolled in a course and return them in a list
 def get_enrolled_students(course_code, semester):
     """Get list of students enrolled in a specific course with updated structure"""
     students = []
     for line in read_file(STUDENTS_FILE):
-        if len(line) >= 6:  # Check for new file structure
+        if len(line) >= 6: 
             student_id, name, email, enrolled_courses, total_fees, outstanding_fees = line
             if course_code in enrolled_courses.split():
                 students.append({
@@ -104,6 +116,7 @@ def get_enrolled_students(course_code, semester):
                 })
     return students
 
+# Function to get date
 def get_date():
     # Get date input
     while True:
@@ -121,7 +134,7 @@ def get_date():
         print("Invalid date format. Please use YYYY/MM/DD")
     return date
 
-# The rest of your functions (load_users, authenticate, login, etc.) remain the same
+# Function to load users and return them in a dictionary
 def load_users():
     """
     Load user data from users.txt
@@ -148,6 +161,7 @@ def load_users():
         exit()
     return users
 
+# Function to authenticate user and redirect them to their respective menu
 def authenticate(email, password, users):
     """Authenticate user and redirect to appropriate menu"""
     if not email or not password:
@@ -182,10 +196,13 @@ def authenticate(email, password, users):
     else:
         print("User not found. Please try again.")
 
+# Function to display login menu
 def login(users):
     print("\n----- Login -----")
     while True:
         email = input("Enter email: ").strip()
+
+        # Email validation
         if not email:
             print("Email cannot be empty")
             continue
@@ -197,10 +214,10 @@ def login(users):
     password = input("Enter password: ").strip()
     authenticate(email, password, users)
 
-#----------------------------------------------------------HASSAN ABDALLA--------------------------------------------------------------------------------------
+#-------------------------------------------------------------LECTURER MENU--------------------------------------------------------------------------------------
 
+# Function to get course details for multiple course codes
 def get_courses(course_codes):
-    #Get course details for multiple course codes
     if not course_codes:
         return []
         
@@ -216,10 +233,10 @@ def get_courses(course_codes):
     
     return courses
 
+# Function to select a module from lecturer's assigned courses
 def select_module(lecturer_id):
-    """Select a module from lecturer's assigned courses"""
     for line in read_file(LECTURERS_FILE):
-        l_id, l_name, l_email, course_code = line
+        l_id, _, _, course_code = line
         if l_id == lecturer_id:
             courses = get_courses(course_code)
             if not courses:
@@ -246,26 +263,13 @@ def select_module(lecturer_id):
                 print("Please enter a valid number")
                 return None
 
-def get_enrolled_students(course_code, semester):
-    """Get list of students enrolled in a specific course"""
-    students = []
-    for line in read_file(STUDENTS_FILE):
-        student_id, name, email, enrolled_courses, total_fees, outstanding_fees = line
-        # Check if the course is in student's enrolled courses
-        if course_code in enrolled_courses.split():
-            students.append({
-                'id': student_id,
-                'name': name,
-                'email': email,
-                'status': 'Enrolled'
-            })
-    return students
-
+# Function to get all grades in a specific module
 def get_module_grades(course_code, semester):
-    """Get all grades for a specific module"""
     grades = []
+    # Iterating through the grades file
     for line in read_file(GRADES_FILE):
         student_id, module, marks, grade_letter = line
+        # Checking if the module ID matches
         if module == course_code:
             grades.append({
                 'student_id': student_id,
@@ -274,8 +278,9 @@ def get_module_grades(course_code, semester):
             })
     return grades
 
+# Function to calculate letter grade from numerical marks
 def calculate_grade(marks):
-    """Calculate letter grade from numerical marks"""
+    #nested if statements to assign letter grade
     if marks >= 90:
         return 'A+'
     elif marks >= 85:
@@ -297,8 +302,8 @@ def calculate_grade(marks):
     else:
         return 'F'
 
+# Function to update grade for a specific student
 def update_grade(student_id, course_code, semester, marks, grade_letter):
-    """Update or add new grade entry in grades.txt"""
     grades = read_file(GRADES_FILE)
     updated = False
     new_grades = []
@@ -309,23 +314,25 @@ def update_grade(student_id, course_code, semester, marks, grade_letter):
     
     for grade in grades:
         if grade[0] == student_id and grade[1] == course_code:
-            new_grades.append(f"{student_id},{course_code},{marks},{grade_letter}\n")
+            # Updating existing record
+            new_grades.append(f"{student_id},{course_code},{marks:.1f},{grade_letter}\n")
             updated = True
         else:
             new_grades.append(','.join(grade) + '\n')
     
     if not updated:
-        new_grades.append(f"{student_id},{course_code},{marks},{grade_letter}\n")
+        new_grades.append(f"{student_id},{course_code},{marks:.1f},{grade_letter}\n")
     
     write_file(GRADES_FILE, new_grades)
     print(f"\nGrade updated for student {student_id}")
     input("Press Enter to continue...")
 
+# Function to record attendance
 def record_attendance(date, course_code, student_id, status, lecturer_id):
-    """Record new attendance entry in attendance.txt"""
+
     attendance_entry = f"{course_code},{student_id},{date},{status}\n"
     
-    # Read existing attendance to check for duplicates
+    # Reading attendance file to check for duplicates
     attendances = read_file(ATTENDANCE_FILE)
     for attendance in attendances:
         if (attendance[0] == course_code and 
@@ -335,29 +342,22 @@ def record_attendance(date, course_code, student_id, status, lecturer_id):
             input("Press Enter to continue...")
             return
     
+    # Adding new attendance entry to the file
     append_file(ATTENDANCE_FILE, [attendance_entry])
     print(f"\nAttendance recorded for student {student_id}")
     input("Press Enter to continue...")
 
-def get_student_details(student_id):
-    """Get student details from students.txt"""
-    for line in read_file(STUDENTS_FILE):
-        s_id, name, email, enrolled_courses, total_fees, outstanding_fees = line
-        if s_id == student_id:
-            return {
-                'id': s_id,
-                'name': name,
-                'email': email,
-                'status': 'Enrolled'
-            }
-    return None
+# Function to display the main lecturer menu
 def lecturer_menu(email):
+    # Iterating through lecturers file
     for line in read_file(LECTURERS_FILE):
-        l_id, l_name, l_email, course_code = line
+        # Checking if email matches
+        l_id, l_name, l_email, _ = line
         if l_email == email:
             break
 
     while True:
+        # Displaying lecturer menu with personal details (Lecturer's Name)
         print(f"\n===== Welcome {l_name.ljust(15)} =====")
         print("|    1. View Assigned Modules     |")
         print("|    2. Record/Update Grades      |")
@@ -370,6 +370,7 @@ def lecturer_menu(email):
         choice = input("Enter your choice: ")
         print("===============================\n")
         
+        # Handling user's choice
         if choice == "1":
             view_assigned_modules(l_id)
         elif choice == "2":
@@ -387,11 +388,16 @@ def lecturer_menu(email):
             print("Invalid choice. Please try again.")
             input("Press Enter to continue...")
 
+# Function to view assigned modules for the lecturer
 def view_assigned_modules(lecturer_id):
     for line in read_file(LECTURERS_FILE):
-        l_id, l_name, l_email, course_code = line
+        l_id, l_name, _, course_code = line
+
+        # Checking if lecturer ID matches
         if l_id == lecturer_id:
             courses = get_courses(course_code)
+            
+            # Displaying assigned modules with headers
             print(f"\n================== Assigned Modules for {l_name} ====================")
             print(f"Course Code".ljust(15) + "Course Name".ljust(25) + "Credit Hours".ljust(15) + "Semester")
             print("-" * 70)
@@ -401,7 +407,10 @@ def view_assigned_modules(lecturer_id):
             input("Press Enter to continue...")
             return
 
+# Function to record and update grades
 def record_grades(lecturer_id):
+
+    # Selecting module
     module = select_module(lecturer_id)
     if not module:
         return
@@ -412,7 +421,8 @@ def record_grades(lecturer_id):
         input("Press Enter to continue...")
         return
     
-    print(f"\n=== Record Grades for {module['course_code']} ===\n")
+    # Displaying headers
+    print(f"\n===== Record Grades for {module['course_code']} =====\n")
     print("-"*55)
     print(f"Student ID".ljust(15) + "Name".ljust(25) + "Current Grade")
     print("-" * 55)
@@ -421,6 +431,8 @@ def record_grades(lecturer_id):
     grades_dict = {grade['student_id']: grade['marks'] for grade in current_grades}
     
     for student in students:
+
+        # Displaying current grades for each student
         current_grade = grades_dict.get(student['id'], 'Not graded')
         print(student['id'].ljust(15) + student['name'].ljust(25) + current_grade)
     
@@ -428,41 +440,55 @@ def record_grades(lecturer_id):
     for student in students:
         while True:
             grade_input = input(f"\nGrade for {student['name']} ({student['id']}): ").strip()
-            if not grade_input:  # Skip this student
+            
+            if not grade_input:
+                # If no input, skip to the next student
                 break
             try:
                 marks = float(grade_input)
+                #Validating marks
                 if 0 <= marks <= 100:
                     grade_letter = calculate_grade(marks)
-                    update_grade(student['id'], module['course_code'], 
-                               module['semester'], marks, grade_letter)
+                    
+                    #Updating grade
+                    update_grade(student['id'], module['course_code'], module['semester'], marks, grade_letter)
                     break
                 else:
                     print("Marks must be between 0 and 100")
             except ValueError:
                 print("Please enter a valid number")
 
+# Function to view student list
 def view_student_list(lecturer_id):
+    
+    # Selecting a module
     module = select_module(lecturer_id)
     if not module:
         return
-        
+    
     students = get_enrolled_students(module['course_code'], module['semester'])
     if not students:
         print("\nNo students enrolled in this module.")
         input("Press Enter to continue...")
         return
     
+    # Displaying headers
     print(f"\n=== Student List for {module['course_code']} ===")
     print(f"ID".ljust(10) + "Name".ljust(25)+"Email")
     print("-" * 60)
     
     for student in students:
+
+        # Displaying students' details
         print(student['id'].ljust(10) + student['name'].ljust(25)+student['email'])
     print("-" * 60)
     input("Press Enter to continue...")
 
+
+# Function to track attendance
 def track_attendance(lecturer_id):
+
+    # Selecting a module
     module = select_module(lecturer_id)
     if not module:
         return
@@ -475,22 +501,31 @@ def track_attendance(lecturer_id):
     
     date = get_date()
     
+    # Displaying headers
     print(f"\n=== Mark Attendance for {module['course_code']} ===")
     print(f"Date: {date}")
     print("\nMark attendance: (P)resent, (A)bsent, (L)ate")
     
     for student in students:
         while True:
+
+            # Taking attendance
             status = input(f"{student['name']} ({student['id']}): ").upper()
+
+            # Validating input
             if status in ['P', 'A', 'L']:
                 full_status = {'P': 'Present', 'A': 'Absent', 'L': 'Late'}[status]
-                record_attendance(date, module['course_code'], 
-                                student['id'], full_status, lecturer_id)
+
+                # Recording attendance
+                record_attendance(date, module['course_code'], student['id'], full_status, lecturer_id)
                 break
             else:
                 print("Invalid input. Please use P, A, or L.")
 
+# Function to view student grades
 def view_student_grades(lecturer_id):
+
+    # Selecting a module
     module = select_module(lecturer_id)
     if not module:
         return
@@ -501,6 +536,7 @@ def view_student_grades(lecturer_id):
         input("Press Enter to continue...")
         return
         
+    # Displaying headers
     print(f"\n=== Grade Report for {module['course_code']} ===")
     print(f"ID".ljust(10)+"Name".ljust(25)+"Marks".ljust(10)+"Grade")
     print("-" * 70)
@@ -508,13 +544,19 @@ def view_student_grades(lecturer_id):
     for grade in grades:
         student = get_student_details(grade['student_id'])
         if student:
+
+            # Displaying grades if student details are available
             print(student['id'].ljust(10)+student['name'].ljust(25)+grade['marks'].ljust(10)+grade['grade_letter'])
     
-    # Calculate and display statistics
+    # Calculate and display statistics from all marks
     marks = [float(grade['marks']) for grade in grades]
-    avg = sum(marks) / len(marks) if marks else 0
-    highest = max(marks) if marks else 0
-    lowest = min(marks) if marks else 0
+    
+    if marks:
+        avg = sum(marks) / len(marks)
+        highest = max(marks)
+        lowest = min(marks)
+    else:
+        avg = highest = lowest = 0
     
     print("-" * 70)
     print(f"Class Average: {avg:.2f}")
@@ -523,7 +565,7 @@ def view_student_grades(lecturer_id):
     print("-" * 70)
     input("Press Enter to continue...")
 
-#------------------------------------------------MOHAMMED EISSA--------------------------------------------------
+#---------------------------------------------------ACCOUNTANT MENU--------------------------------------------------------------------------------
 def record_tuition_fee():
     """Record a payment and update student fees."""
     student_id = input("Enter Student ID: ").strip()
@@ -689,9 +731,8 @@ def accountant_menu():
         else:
             print("Invalid choice. Please try again.")
 
-#-----------------------------------------Omda-----------------------------------------------------------------------
-# Common File Handling Functions
-# Common File Handling Functions
+#-------------------------------------------ADMINISTRATOR MENU----------------------------------------------------------------------------------
+
 def reset_user_password():
     """Allows the administrator to reset a user's password."""
     user_id = input("Enter User ID: ").strip()
@@ -1259,7 +1300,7 @@ def delete_record(file_name, match_function):
 admin_menu("admin@example.com")
 
 
-#----------------------------------------------------KHALED------------------------------------------------------------------------
+#----------------------------------------------------STUDENT MENU-------------------------------------------------------------------------------
 # Constants for file paths and valid status values remain the same...
 
 def view_available_modules(semester=None):
@@ -1588,41 +1629,7 @@ def student_menu(email):
             break
         else:
             print("\nInvalid choice. Please try again.")
-#---------------------------------------------------HUSSEIN-----------------------------------------------------------------------------------
-# Constants for file paths
-STUDENTS_FILE = "students.txt"
-COURSES_FILE = "courses.txt"
-GRADES_FILE = "grades.txt"
-USERS_FILE = "users.txt"
-
-# Function to read data from a file
-def read_file(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            next(file)  # Skip header
-            return [line.strip().split(',') for line in file]
-    except FileNotFoundError:
-        print(f"Error: {file_path} not found.")
-        return []
-    except Exception as e:
-        print(f"Error reading {file_path}: {e}")
-        return []
-
-# Function to write data to a file
-def write_file(file_path, data):
-    try:
-        with open(file_path, 'w') as file:
-            file.writelines(data)
-    except Exception as e:
-        print(f"Error writing to {file_path}: {e}")
-
-# Function to append data to a file
-def append_file(file_path, data):
-    try:
-        with open(file_path, 'a') as file:
-            file.writelines(data)
-    except Exception as e:
-        print(f"Error appending to {file_path}: {e}")
+#---------------------------------------------------REGISTRAR MENU-----------------------------------------------------------------------------------
 
 # Function to register a new student
 def register_student():
@@ -1780,8 +1787,10 @@ def registrar_menu():
 registrar_menu()
 
 #--------------------------------------- Main program entry point--------------------------------------------------
-users = load_users()
 
 print("Welcome to the University Management System (UMS)")
+# Load user data
+users = load_users()
+# calling Login function
 print("Please login to continue:")
 login(users)
